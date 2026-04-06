@@ -1,0 +1,8 @@
+{
+  "name": "SK Group of Company",
+  "description": "A multimodal AI-powered cinematic website for SK Group of Company featuring SK Orbix, Character Chat, and immersive 3D scrolling.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

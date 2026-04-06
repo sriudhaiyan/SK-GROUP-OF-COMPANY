@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the SK Group apps",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "rank": { "type": "string", "enum": ["E", "D", "C", "B", "A", "S", "V", "K"] },
+        "subscription": { "type": "string", "enum": ["free", "starter", "pro", "studio"] },
+        "createdAt": { "type": "timestamp" },
+        "lastLogin": { "type": "timestamp" }
+      },
+      "required": ["uid", "email", "createdAt", "lastLogin"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "A chat message with an AI character",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "characterId": { "type": "string" },
+        "userMessage": { "type": "string" },
+        "aiResponse": { "type": "string" },
+        "userImage": { "type": "string" },
+        "aiImage": { "type": "string" },
+        "timestamp": { "type": "timestamp" }
+      },
+      "required": ["userId", "characterId", "userMessage", "aiResponse", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/Chat" },
+      "description": "Chat messages"
+    }
+  }
+}
