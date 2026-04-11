@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
+import { GoogleGenAI, LiveServerMessage, Modality, Type } from '@google/genai';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mic, MicOff, Bot, X } from 'lucide-react';
 import { APPS_DATA } from '../data/content';
@@ -53,10 +53,10 @@ Be concise, helpful, and slightly robotic but friendly.`;
         name: "generateSong",
         description: "Generate a short music clip or song based on a prompt.",
         parameters: {
-          type: "OBJECT",
+          type: Type.OBJECT,
           properties: {
             prompt: {
-              type: "STRING",
+              type: Type.STRING,
               description: "The detailed prompt describing the music to generate (e.g., 'A 30-second cinematic orchestral track' or 'An upbeat pop song about SK Orbix')."
             }
           },

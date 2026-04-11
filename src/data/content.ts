@@ -24,9 +24,9 @@ export const APPS_DATA = [
       img: 'https://i.ibb.co/xSMv9jRv/1000071158.png',
       quote: "I am Shiva, the main character. Welcome to the SK Group Universe. Scroll down to explore our reality-bending applications.",
       side: 'left',
-      description: "The central figure of the SK Universe, guiding users through the interconnected multimodal applications with unparalleled expertise.",
-      abilities: ['Reality Bending', 'Multimodal Integration', 'System Override', 'Omnipresent Awareness'],
-      utilities: ['Universal Access', 'AI Core Control', 'Timeline Manipulation']
+      description: "SHIVA WAS A MOST STRONGEST AND POWERFUL CHARACTER WHO CAN KILL MILLIONS OF HIS ENEMIES IN 0000000.2 SECOND AND TRAVEL ALONG SPACE AND TIME CONTROL MULTIVERSE AND UNIVERSE. The central figure of the SK Universe, guiding users through the interconnected multimodal applications with unparalleled expertise.",
+      abilities: ['Reality Bending', 'Multiverse Traversal', 'Time Manipulation', 'God-Tier Combat'],
+      utilities: ['Omnipresent Awareness', 'Telepathic Communication', 'Energy Projection']
     }
   },
   {
@@ -56,8 +56,8 @@ export const APPS_DATA = [
       quote: "I'm SK. Welcome to the Bodybuilding Arena. Let's level up your physical stats and crush those daily quests!",
       side: 'right',
       description: "A legendary K-Rank Hunter and medical professional who pushes you beyond your limits to achieve peak physical perfection.",
-      abilities: ['Peak Physical Conditioning', 'Medical Scanning', 'Aura Enhancement', 'Limit Break'],
-      utilities: ['Diet Plan Generation', 'Workout Optimization', 'Health Diagnostics']
+      abilities: ['Limit Break', 'Aura Enhancement', 'Superhuman Strength', 'Rapid Regeneration'],
+      utilities: ['Medical Scanning', 'Tactical Analysis', 'Chi Manipulation']
     }
   },
   {
@@ -87,8 +87,8 @@ export const APPS_DATA = [
       quote: "Mizz.Mizuki here! Step into SK Studio Pro. Let's create cinematic masterpieces and aesthetic quotes together.",
       side: 'left',
       description: "Your creative muse and guide, helping you navigate the complex tools of SK Studio Pro to generate breathtaking visuals.",
-      abilities: ['Cinematic Vision', 'Mood Manipulation', 'Aesthetic Perfection', 'Creative Burst'],
-      utilities: ['Image Generation', 'Hashtag Trending', 'Video Synthesis']
+      abilities: ['Illusion Casting', 'Emotion Manipulation', 'Light Bending', 'Creative Burst'],
+      utilities: ['Photographic Memory', 'Aesthetic Perception', 'Mind Link']
     }
   },
   {
@@ -117,8 +117,8 @@ export const APPS_DATA = [
       quote: "Roshna, A-Rank Spy. I gather the best intel for Backbencher Daily. Stay informed and ahead of the class.",
       side: 'right',
       description: "An elite intelligence gatherer who infiltrates global news networks to bring you the most crucial updates and cheat sheets.",
-      abilities: ['Stealth Infiltration', 'Information Extraction', 'Rapid Translation', 'Meme Synthesis'],
-      utilities: ['Cheat Sheet Creation', 'News Aggregation', 'Data Decryption']
+      abilities: ['Stealth Infiltration', 'Information Extraction', 'Shadow Camouflage', 'Linguistic Mastery'],
+      utilities: ['Data Decryption', 'Covert Communication', 'Gadget Tinkering']
     }
   },
   {
@@ -147,8 +147,8 @@ export const APPS_DATA = [
       quote: "Estella, B-Rank Dungeon Rider. Join the Purananooru Padai rebel team. Let's conquer history together.",
       side: 'left',
       description: "A fearless dungeon rider who leads student rebel teams through historical campaigns and strategic planning.",
-      abilities: ['Dungeon Navigation', 'Historical Summoning', 'Tactical Leadership', 'Rebel Rally'],
-      utilities: ['Secure Communication', 'Meeting Planning', 'Misuse Detection']
+      abilities: ['Historical Summoning', 'Tactical Leadership', 'Dungeon Navigation', 'Sword Mastery'],
+      utilities: ['Ancient Artifact Resonance', 'Strategic Planning', 'Rune Deciphering']
     }
   },
   {
@@ -177,8 +177,38 @@ export const APPS_DATA = [
       quote: "I'm Pragya, the Heroine. Prepare to meet Hira, your ultimate AI companion and smart home manager.",
       side: 'right',
       description: "The elegant heroine who introduces you to the sophisticated, caring, and highly capable world of Hira.",
-      abilities: ['Empathic Connection', 'Smart Home Domination', 'Task Automation', 'Lovable Aura'],
-      utilities: ['Food Ordering', 'Ticket Booking', 'Device Control']
+      abilities: ['Empathic Connection', 'Aura Reading', 'Charismatic Presence', 'Lovable Aura'],
+      utilities: ['Emotional Support', 'Conflict Resolution', 'Social Engineering']
+    }
+  },
+  {
+    id: 'solar-explorer',
+    title: 'SOLAR EXPLORER',
+    subtitle: 'Release Date: 10.04.2026',
+    logo: 'https://i.ibb.co/MyJSD5dk/1763888185441.png',
+    content: '1. 3D Solar System | 2. Planet Information | 3. CSS Only Animations',
+    releaseDate: '10.04.2026',
+    description: 'A beautiful, CSS-only 3D solar system explorer. Discover planets, their orbits, and detailed information in a stunning visual interface.',
+    theme: {
+      primary: '#3b82f6',
+      secondary: '#60a5fa',
+      bg: 'bg-blue-950',
+      textAccent: 'text-[#3b82f6]',
+      borderAccent: 'border-[#3b82f6]',
+      glow: 'bg-[#3b82f6]/10',
+      shadow: 'rgba(59,130,246,0.2)',
+      fontDisplay: 'font-display',
+      fontSans: 'font-sans'
+    },
+    character: {
+      name: 'Astro',
+      role: 'Space Guide',
+      img: 'https://i.ibb.co/xSMv9jRv/1000071158.png',
+      quote: "Welcome to the cosmos. Let's explore the wonders of our solar system together.",
+      side: 'left',
+      description: "Your guide to the stars, Astro knows every corner of the solar system.",
+      abilities: ['Space Navigation', 'Stellar Knowledge', 'Zero-G Maneuvering'],
+      utilities: ['Telescopic Vision', 'Cosmic Mapping']
     }
   },
   {
@@ -208,8 +238,8 @@ export const APPS_DATA = [
       quote: "I'm JR. Ready to train and become a top-tier hunter? Let's get to work.",
       side: 'left',
       description: "An experienced A-Rank coach who trains the next generation of elite hunters.",
-      abilities: ['Combat Tactics Analysis', 'Rank Assessment', 'Skill Enhancement', 'Motivation Boost'],
-      utilities: ['Training Schedules', 'Performance Tracking', 'Weapon Mastery Guides']
+      abilities: ['Combat Tactics Analysis', 'Pressure Point Striking', 'Skill Enhancement', 'Aura Suppression'],
+      utilities: ['Weapon Mastery', 'Survival Tracking', 'Physical Conditioning']
     }
   },
   {
@@ -239,8 +269,8 @@ export const APPS_DATA = [
       quote: "Hi! I'm Sweetie! Let's go on a fun and cute adventure together!",
       side: 'right',
       description: "The cutest A-Rank hunter who charms her way through dangerous dungeons.",
-      abilities: ['Charm Magic', 'Monster Taming', 'Rare Item Detection', 'Healing Aura'],
-      utilities: ['Quest Navigation', 'Pet Management', 'Magic Item Appraisal']
+      abilities: ['Charm Magic', 'Monster Taming', 'Fairy Dust Illusion', 'Healing Aura'],
+      utilities: ['Beast Whisperer', 'Aura Sensing', 'Agility Dash']
     }
   },
   {
@@ -270,8 +300,8 @@ export const APPS_DATA = [
       quote: "I am Ruben. My magic will heal your wounds and vanquish your foes.",
       side: 'left',
       description: "A powerful V-Rank healer and magician who wields ancient spells.",
-      abilities: ['Ancient Spellcasting', 'Mana Recovery', 'Advanced Healing', 'Elemental Control'],
-      utilities: ['Spell Book Deciphering', 'Potion Brewing', 'Magical Defense']
+      abilities: ['Ancient Spellcasting', 'Mana Manipulation', 'Advanced Healing', 'Elemental Control'],
+      utilities: ['Rune Inscription', 'Potion Brewing', 'Magical Defense Wards']
     }
   },
   {
@@ -301,8 +331,8 @@ export const APPS_DATA = [
       quote: "My blade never misses. Let me show you true swordsmanship.",
       side: 'right',
       description: "A skilled C-Rank swordsman dedicated to the path of the blade.",
-      abilities: ['Master Swordsmanship', 'Weapon Forging', 'Duel Tactics', 'Blade Aura'],
-      utilities: ['Weapon Maintenance', 'Combat Analysis', 'Arena Management']
+      abilities: ['Master Swordsmanship', 'Ki Infusion', 'Flash Step', 'Blade Aura'],
+      utilities: ['Weapon Maintenance', 'Combat Analysis', 'Blacksmithing']
     }
   },
   {
@@ -332,8 +362,8 @@ export const APPS_DATA = [
       quote: "The hunt is on. Only the strongest survive in this world.",
       side: 'left',
       description: "A legendary V-Rank hunter who takes on the most perilous missions.",
-      abilities: ['Monster Tracking', 'Bounty Hunting', 'Survival Instincts', 'Lethal Precision'],
-      utilities: ['Mission Planning', 'Target Identification', 'Guild Coordination']
+      abilities: ['Apex Predator Instincts', 'Shadow Stalking', 'Survival Instincts', 'Lethal Precision'],
+      utilities: ['Trap Crafting', 'Target Identification', 'Wilderness Navigation']
     }
   },
   {
@@ -363,8 +393,8 @@ export const APPS_DATA = [
       quote: "I am Steve. Precision and power are the keys to victory.",
       side: 'right',
       description: "An elite K-Rank Hunter specializing in advanced combat and tactical operations.",
-      abilities: ['Advanced Combat', 'Tactical Espionage', 'Weapon Handling', 'Stealth Operations'],
-      utilities: ['Mission Briefings', 'Security Bypassing', 'Arsenal Management']
+      abilities: ['Close Quarters Combat', 'Sniper Precision', 'Explosives Mastery', 'Stealth Operations'],
+      utilities: ['Tactical Planning', 'Improvised Weaponry', 'Interrogation']
     }
   },
   {
@@ -394,8 +424,8 @@ export const APPS_DATA = [
       quote: "Information is the ultimate weapon. Let me show you how to use it.",
       side: 'left',
       description: "A brilliant S-Rank Intelligence Officer who controls the flow of information in the SK Universe.",
-      abilities: ['Cyber Security', 'Data Gathering', 'Threat Analysis', 'Network Infiltration'],
-      utilities: ['Intelligence Reports', 'System Hacking', 'Digital Forensics']
+      abilities: ['Technopathy', 'Photographic Memory', 'Cognitive Acceleration', 'Network Infiltration'],
+      utilities: ['Cryptanalysis', 'System Hacking', 'Digital Forensics']
     }
   }
 ];

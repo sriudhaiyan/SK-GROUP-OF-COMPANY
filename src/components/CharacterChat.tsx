@@ -1,9 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 
 export function CharacterChat() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname === '/nexora') return null;
 
   return (
     <button 

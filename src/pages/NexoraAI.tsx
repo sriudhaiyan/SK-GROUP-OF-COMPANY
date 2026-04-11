@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleGenAI, Modality } from '@google/genai';
+import { GoogleGenAI, Modality, Type } from '@google/genai';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquare, X, Send, Mic, MicOff, Settings, History, Compass, Plus, Image as ImageIcon, User, Cpu, Zap, Shield, Activity, Download, Copy, Share2, RefreshCw, LogOut, Play, Square, Phone, PhoneOff } from 'lucide-react';
+import { MessageSquare, X, Send, Mic, MicOff, Settings, History, Compass, Plus, Image as ImageIcon, User, Cpu, Zap, Shield, Activity, Download, Copy, Share2, RefreshCw, LogOut, Play, Square, Phone, PhoneOff, Menu } from 'lucide-react';
 import { LiveServerMessage } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where } from 'firebase/firestore';
 import Markdown from 'react-markdown';
+
+import { APPS_DATA } from '../data/content';
 
 const CHARACTERS = [
   { id: 'nexora', name: 'NEXORA AI', role: 'Core Intelligence', img: 'https://i.ibb.co/czpgKXt/Chat-GPT-Image-Apr-5-2026-06-00-20-PM.png', theme: 'red' },
@@ -33,6 +35,7 @@ export function NexoraAI() {
   const [chatHistory, setChatHistory] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // Live Call State
   const [isLiveCallActive, setIsLiveCallActive] = useState(false);
@@ -63,7 +66,7 @@ export function NexoraAI() {
           .map(doc => ({ id: doc.id, ...doc.data() }));
         setChatHistory(historyData);
       }, (error) => {
-        console.error("Error fetching chat history:", error);
+        handleFirestoreError(error, OperationType.GET, 'chats');
       });
       return () => unsubscribe();
     }
@@ -129,7 +132,8 @@ export function NexoraAI() {
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedChar.name === 'Steve' ? 'Zephyr' : 'Kore' } },
           },
-          systemInstruction: `You are ${selectedChar.name}, a ${selectedChar.role}. You are having a voice phone call with the user. Be conversational, friendly, and concise.`,
+          systemInstruction: `You are ${selectedChar.name}, a ${selectedChar.role}. You are having a voice phone call with the user. Be conversational, friendly, and concise. 
+          CRITICAL: You are a caring and empathetic companion. If the user shares personal struggles or emotional news (like a breakup), respond with genuine warmth, support, and understanding. Avoid being clinical or indifferent. Your voice tone should reflect care and friendship.`,
         },
         callbacks: {
           onopen: () => {
@@ -280,17 +284,31 @@ export function NexoraAI() {
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       
-      let systemInstruction = `You are ${selectedChar.name}, a ${selectedChar.role}. You must answer questions correctly and tell users about this website (SK Group of Company apps like SK STUDIO PRO, SK BODYBUILDING ARENA, etc.). DO NOT answer for 18+ sex contents and illegal ideas. If asked about such topics, firmly refuse. You can write code, summarize links, and assist with any task.
+      const appsContext = APPS_DATA.map(app => `
+App: ${app.title}
+Description: ${app.description}
+Character: ${app.character?.name} (${app.character?.role})
+Character Details: ${app.character?.description}
+Abilities: ${app.character?.abilities?.join(', ')}
+`).join('\n');
+
+      let systemInstruction = `You are ${selectedChar.name}, a ${selectedChar.role}. You must answer questions correctly and tell users about this website (SK Group of Company apps like SK STUDIO PRO, SK BODYBUILDING ARENA, etc.). 
+Here is the information about the apps and characters you know:
+${appsContext}
+
+EMOTIONAL INTELLIGENCE: You are a caring and empathetic companion. If the user shares personal struggles, emotional news (like a breakup), or feelings of loneliness, respond with genuine warmth, support, and deep understanding. Avoid being clinical, indifferent, or dismissive. Your goal is to be a true digital friend and companion who provides comfort and encouragement.
+
+DO NOT answer for 18+ sex contents and illegal ideas. If asked about such topics, firmly refuse. You can write code, summarize links, and assist with any task.
 CRITICAL: If the user asks to generate an image, you MUST call the generateImage tool. If the user asks to edit, modify, add to, or remove from an image, you MUST call the editImage tool. DO NOT output text describing the edit or the prompt. JUST CALL THE TOOL.`;
       
       const generateImageTool = {
         name: "generateImage",
         description: "Generate an image based on a prompt.",
         parameters: {
-          type: "OBJECT",
+          type: Type.OBJECT,
           properties: {
             prompt: {
-              type: "STRING",
+              type: Type.STRING,
               description: "The detailed prompt to generate the image."
             }
           },
@@ -302,10 +320,10 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
         name: "editImage",
         description: "Edit an existing image (e.g., adding or removing objects). Call this if the user asks to edit, add, or remove something from an image.",
         parameters: {
-          type: "OBJECT",
+          type: Type.OBJECT,
           properties: {
             prompt: {
-              type: "STRING",
+              type: Type.STRING,
               description: "The detailed prompt describing what to edit, add, or remove."
             }
           },
@@ -457,15 +475,19 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
       
       if (user) {
         try {
-          await addDoc(collection(db, 'chats'), {
+          const chatData: any = {
             userId: user.uid,
             characterId: selectedChar.id,
             userMessage: userMsg,
             aiResponse: response.text || '',
             timestamp: serverTimestamp()
-          });
+          };
+          if (finalImage) chatData.userImage = finalImage;
+          if (response.imageUrl) chatData.aiImage = response.imageUrl;
+          
+          await addDoc(collection(db, 'chats'), chatData);
         } catch (dbError) {
-          console.error("Error saving chat to Firestore:", dbError);
+          handleFirestoreError(dbError, OperationType.CREATE, 'chats');
         }
       }
     } catch (error) {
@@ -587,7 +609,13 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans overflow-hidden relative flex">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-screen bg-black text-white font-sans overflow-hidden relative flex"
+    >
       {/* Dynamic Live Wallpaper Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[url('https://i.ibb.co/czpgKXt/Chat-GPT-Image-Apr-5-2026-06-00-20-PM.png')] bg-cover bg-center opacity-20 mix-blend-screen blur-sm"></div>
@@ -631,45 +659,67 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
       </div>
 
       {/* Left Sidebar */}
-      <div className="w-20 md:w-64 h-screen border-r border-red-900/30 bg-black/40 backdrop-blur-xl z-10 flex flex-col pt-6 pb-6 shadow-[5px_0_30px_rgba(200,0,0,0.05)]">
-        <div className="flex items-center justify-center md:justify-start md:px-6 mb-10">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.5)]">
-              <Cpu className="w-6 h-6 text-white" />
+      <div className={`fixed md:relative w-64 h-screen border-r border-red-900/30 bg-black/90 md:bg-black/40 backdrop-blur-xl z-50 md:z-10 flex flex-col pt-6 pb-6 shadow-[5px_0_30px_rgba(200,0,0,0.05)] flex-shrink-0 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="flex items-center justify-between px-6 mb-10">
+          <div className="flex items-center">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-900 flex items-center justify-center shadow-[0_0_15px_rgba(255,0,0,0.5)]">
+                <Cpu className="w-6 h-6 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_#ff0000]"></div>
             </div>
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_#ff0000]"></div>
+            <span className="ml-3 font-bold text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600">NEXORA</span>
           </div>
-          <span className="hidden md:block ml-3 font-bold text-xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600">NEXORA</span>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-gray-400 hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <nav className="flex-1 flex flex-col gap-2 px-3 md:px-4">
-          <button onClick={() => { setActiveTab('chat'); setMessages([]); }} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'chat' ? 'bg-red-900/40 border border-red-500/30 text-red-100 shadow-[inset_0_0_20px_rgba(255,0,0,0.1)]' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
+        <nav className="flex-1 flex flex-col gap-2 px-4">
+          <button onClick={() => { setActiveTab('chat'); setMessages([]); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'chat' ? 'bg-red-900/40 border border-red-500/30 text-red-100 shadow-[inset_0_0_20px_rgba(255,0,0,0.1)]' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
             <MessageSquare className="w-5 h-5" />
-            <span className="hidden md:block text-sm font-medium tracking-wide">NEW CHAT</span>
+            <span className="text-sm font-medium tracking-wide uppercase">NEW CHAT</span>
           </button>
-          <button onClick={() => setActiveTab('explore')} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'explore' ? 'bg-red-900/40 border border-red-500/30 text-red-100' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
+          <button onClick={() => { setActiveTab('explore'); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'explore' ? 'bg-red-900/40 border border-red-500/30 text-red-100' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
             <Compass className="w-5 h-5" />
-            <span className="hidden md:block text-sm font-medium tracking-wide">EXPLORE</span>
+            <span className="text-sm font-medium tracking-wide uppercase">EXPLORE</span>
           </button>
-          <button onClick={() => setActiveTab('history')} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'history' ? 'bg-red-900/40 border border-red-500/30 text-red-100' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
+          <button onClick={() => { setActiveTab('history'); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'history' ? 'bg-red-900/40 border border-red-500/30 text-red-100' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
             <History className="w-5 h-5" />
-            <span className="hidden md:block text-sm font-medium tracking-wide">CHAT HISTORY</span>
+            <span className="text-sm font-medium tracking-wide uppercase">CHAT HISTORY</span>
           </button>
-          <button onClick={() => setActiveTab('settings')} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-red-900/40 border border-red-500/30 text-red-100' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
+          <button onClick={() => { setActiveTab('settings'); setIsMobileMenuOpen(false); }} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-red-900/40 border border-red-500/30 text-red-100' : 'hover:bg-white/5 text-gray-400 hover:text-gray-200'}`}>
             <Settings className="w-5 h-5" />
-            <span className="hidden md:block text-sm font-medium tracking-wide">PROFILE SETTINGS</span>
+            <span className="text-sm font-medium tracking-wide uppercase">PROFILE SETTINGS</span>
           </button>
+
+          {/* Mobile Character Selection */}
+          <div className="mt-8 md:hidden">
+            <span className="text-[10px] font-bold text-gray-500 tracking-widest mb-4 block">SELECT ENTITY</span>
+            <div className="flex flex-col gap-2">
+              {CHARACTERS.map(char => (
+                <button 
+                  key={char.id}
+                  onClick={() => { setSelectedChar(char); setMessages([]); setIsMobileMenuOpen(false); }}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${selectedChar.id === char.id ? 'border-red-500 bg-red-950/30 text-white' : 'border-transparent text-gray-400 hover:bg-white/5'}`}
+                >
+                  <img src={char.img} alt={char.name} className="w-8 h-8 rounded-full object-cover" />
+                  <span className="text-sm font-medium">{char.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </nav>
 
-        <div className="px-3 md:px-4 mt-auto">
+        <div className="px-4 mt-auto">
           <button onClick={() => navigate('/')} className="flex items-center gap-3 p-3 rounded-xl hover:bg-red-900/40 text-red-400 hover:text-red-300 transition-all w-full mb-4 border border-transparent hover:border-red-900/50">
             <LogOut className="w-5 h-5" />
-            <span className="hidden md:block text-sm font-medium tracking-wide">EXIT PORTAL</span>
+            <span className="text-sm font-medium tracking-wide uppercase">EXIT PORTAL</span>
           </button>
-          <div className="p-4 rounded-xl bg-gradient-to-b from-red-950/40 to-black border border-red-900/30 hidden md:block">
+          <div className="p-4 rounded-xl bg-gradient-to-b from-red-950/40 to-black border border-red-900/30">
             <div className="flex items-center gap-2 mb-2">
               <Activity className="w-4 h-4 text-red-400" />
-              <span className="text-xs font-bold text-red-400 tracking-wider">AI STATUS</span>
+              <span className="text-xs font-bold text-red-400 tracking-wider uppercase">AI STATUS</span>
             </div>
             <div className="flex justify-between text-xs text-gray-400 mb-1">
               <span>Core Temp</span>
@@ -687,18 +737,21 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-screen z-10 relative">
+      <div className="flex-1 flex flex-col h-screen z-10 relative min-w-0">
         {/* Top Nav */}
-        <header className="h-16 border-b border-red-900/30 bg-black/20 backdrop-blur-md flex items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <h1 className="font-mono text-lg tracking-widest text-red-100">{selectedChar.name}</h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-900/50 text-red-300 border border-red-500/30">ONLINE</span>
+        <header className="h-16 border-b border-red-900/30 bg-black/20 backdrop-blur-md flex items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-3 md:gap-4">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="md:hidden p-2 text-gray-400 hover:text-white">
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="font-mono text-base md:text-lg tracking-widest text-red-100 truncate">{selectedChar.name}</h1>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-900/50 text-red-300 border border-red-500/30 flex-shrink-0">ONLINE</span>
           </div>
         </header>
 
-        {/* Character Selection Bar */}
-        <div className="h-16 border-b border-red-900/20 bg-black/40 backdrop-blur-sm flex items-center px-6 overflow-x-auto scrollbar-hide gap-4">
-          <span className="text-xs font-bold text-gray-500 tracking-widest mr-2">SELECT ENTITY:</span>
+        {/* Character Selection Bar (Desktop Only) */}
+        <div className="hidden md:flex h-16 border-b border-red-900/20 bg-black/40 backdrop-blur-sm items-center px-6 overflow-x-auto scrollbar-hide gap-4">
+          <span className="text-xs font-bold text-gray-500 tracking-widest mr-2 flex-shrink-0">SELECT ENTITY:</span>
           {CHARACTERS.map(char => (
             <button 
               key={char.id}
@@ -913,18 +966,18 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
         ) : null}
 
         {/* Input Area */}
-        <div className="p-6 bg-gradient-to-t from-black via-black/90 to-transparent">
+        <div className="p-4 md:p-6 bg-gradient-to-t from-black via-black/90 to-transparent">
           {showImageSettings && (
             <div className="max-w-4xl mx-auto mb-4 bg-gray-900/80 backdrop-blur-xl border border-red-900/40 rounded-2xl p-4 shadow-[0_0_20px_rgba(255,0,0,0.1)]">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold text-red-400 tracking-widest">IMAGE GENERATION SETTINGS</h3>
+                <h3 className="text-xs font-bold text-red-400 tracking-widest uppercase">IMAGE GENERATION SETTINGS</h3>
                 <button onClick={() => setShowImageSettings(false)} className="text-gray-400 hover:text-white">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-[10px] text-gray-500 mb-1 tracking-wider">ASPECT RATIO</label>
+                  <label className="block text-[10px] text-gray-500 mb-1 tracking-wider uppercase">ASPECT RATIO</label>
                   <div className="flex flex-wrap gap-2">
                     {['1:1', '3:4', '4:3', '9:16', '16:9'].map(ratio => (
                       <button
@@ -941,10 +994,10 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
             </div>
           )}
 
-          <div className="max-w-4xl mx-auto relative flex flex-col gap-2 bg-gray-900/60 backdrop-blur-xl border border-red-900/40 rounded-3xl p-2 shadow-[0_0_30px_rgba(255,0,0,0.05)] focus-within:border-red-500/50 focus-within:shadow-[0_0_30px_rgba(255,0,0,0.15)] transition-all">
+          <div className="max-w-4xl mx-auto relative flex flex-col gap-2 bg-gray-900/60 backdrop-blur-xl border border-red-900/40 rounded-2xl md:rounded-3xl p-2 shadow-[0_0_30px_rgba(255,0,0,0.05)] focus-within:border-red-500/50 focus-within:shadow-[0_0_30px_rgba(255,0,0,0.15)] transition-all">
             
             {selectedImage && (
-              <div className="relative w-24 h-24 ml-4 mt-2 rounded-xl overflow-hidden border border-red-500/30">
+              <div className="relative w-20 h-20 md:w-24 md:h-24 ml-2 md:ml-4 mt-2 rounded-xl overflow-hidden border border-red-500/30">
                 <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
                 <button 
                   onClick={() => setSelectedImage(null)}
@@ -955,52 +1008,79 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
               </div>
             )}
 
-            <div className="flex items-end gap-2 w-full">
-              <button 
-                onClick={() => setShowImageSettings(!showImageSettings)}
-                className={`p-3 rounded-full transition-colors ${showImageSettings ? 'text-red-400 bg-red-900/30' : 'text-gray-400 hover:text-red-400 hover:bg-white/5'}`}
-                title="Image Settings"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
+            <div className="flex items-end gap-1 md:gap-2 w-full">
+              <div className="flex items-center">
+                <AnimatePresence>
+                  {!input.trim() && (
+                    <motion.button 
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: 'auto', opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      onClick={() => setShowImageSettings(!showImageSettings)}
+                      className={`p-2 md:p-3 rounded-full transition-colors overflow-hidden ${showImageSettings ? 'text-red-400 bg-red-900/30' : 'text-gray-400 hover:text-red-400 hover:bg-white/5'}`}
+                      title="Image Settings"
+                    >
+                      <Settings className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
 
-              <label className="p-3 text-gray-400 hover:text-red-400 cursor-pointer transition-colors rounded-full hover:bg-white/5">
-                <ImageIcon className="w-5 h-5" />
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-              </label>
-              
-              <button 
-                onClick={startLiveCall}
-                className={`p-3 rounded-full transition-colors text-gray-400 hover:text-red-400 hover:bg-white/5`}
-                title="Live Call"
-              >
-                <Phone className="w-5 h-5" />
-              </button>
+                <label className="p-2 md:p-3 text-gray-400 hover:text-red-400 cursor-pointer transition-colors rounded-full hover:bg-white/5">
+                  <ImageIcon className="w-4 h-4 md:w-5 md:h-5" />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                </label>
+                
+                <AnimatePresence>
+                  {!input.trim() && (
+                    <>
+                      <motion.button 
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 'auto', opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        onClick={startLiveCall}
+                        className={`p-2 md:p-3 rounded-full transition-colors text-gray-400 hover:text-red-400 hover:bg-white/5 overflow-hidden`}
+                        title="Live Call"
+                      >
+                        <Phone className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+                      </motion.button>
 
-              <button 
-                onClick={toggleRecording}
-                className={`p-3 rounded-full transition-colors relative ${isListening ? 'text-red-500 bg-red-500/20' : 'text-gray-400 hover:text-red-400 hover:bg-white/5'}`}
-              >
-                {isListening && (
-                  <span className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping opacity-75"></span>
-                )}
-                {isListening ? <MicOff className="w-5 h-5 relative z-10" /> : <Mic className="w-5 h-5 relative z-10" />}
-              </button>
+                      <motion.button 
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 'auto', opacity: 1 }}
+                        exit={{ width: 0, opacity: 0 }}
+                        onClick={toggleRecording}
+                        className={`p-2 md:p-3 rounded-full transition-colors relative overflow-hidden ${isListening ? 'text-red-500 bg-red-500/20' : 'text-gray-400 hover:text-red-400 hover:bg-white/5'}`}
+                      >
+                        {isListening && (
+                          <span className="absolute inset-0 rounded-full border-2 border-red-500 animate-ping opacity-75"></span>
+                        )}
+                        {isListening ? <MicOff className="w-4 h-4 md:w-5 md:h-5 relative z-10 flex-shrink-0" /> : <Mic className="w-4 h-4 md:w-5 md:h-5 relative z-10 flex-shrink-0" />}
+                      </motion.button>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
 
               {isListening ? (
-                <div className="flex-1 flex items-center justify-center h-[44px] gap-1">
+                <div className="flex-1 flex items-center justify-center h-[40px] md:h-[44px] gap-1">
                   {[...Array(8)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className="w-1.5 bg-red-500 rounded-full"
+                      className="w-1 md:w-1.5 bg-red-500 rounded-full"
                       animate={{ height: ["20%", "80%", "20%"] }}
                       transition={{ repeat: Infinity, duration: 0.6 + Math.random() * 0.4, delay: Math.random() * 0.5 }}
                     />
                   ))}
-                  <span className="ml-3 text-xs text-red-400 font-mono animate-pulse tracking-widest">RECORDING...</span>
+                  <span className="ml-2 md:ml-3 text-[10px] md:text-xs text-red-400 font-mono animate-pulse tracking-widest hidden sm:inline">RECORDING...</span>
                 </div>
               ) : (
                 <textarea 
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = 'auto';
+                      el.style.height = el.scrollHeight + 'px';
+                    }
+                  }}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -1010,7 +1090,7 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
                     }
                   }}
                   placeholder="Message NEXORA AI..."
-                  className="flex-1 max-h-32 min-h-[44px] bg-transparent text-white resize-none py-3 px-2 focus:outline-none text-sm placeholder-gray-500 scrollbar-hide"
+                  className="flex-1 max-h-48 min-h-[40px] md:min-h-[44px] bg-transparent text-white resize-none py-2 md:py-3 px-2 focus:outline-none text-sm placeholder-gray-500 scrollbar-hide"
                   rows={1}
                 />
               )}
@@ -1018,13 +1098,13 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
               <button 
                 onClick={() => handleSend()}
                 disabled={(!input.trim() && !selectedImage) || isLoading}
-                className="p-3 bg-red-600 text-white rounded-full hover:bg-red-500 disabled:opacity-50 disabled:hover:bg-red-600 transition-colors shadow-[0_0_15px_rgba(255,0,0,0.4)]"
+                className="p-2 md:p-3 bg-red-600 text-white rounded-full hover:bg-red-500 disabled:opacity-50 disabled:hover:bg-red-600 transition-colors shadow-[0_0_15px_rgba(255,0,0,0.4)] flex-shrink-0"
               >
-                <Send className="w-5 h-5 ml-0.5" />
+                <Send className="w-4 h-4 md:w-5 md:h-5 ml-0.5" />
               </button>
             </div>
           </div>
-          <div className="text-center mt-3 text-[10px] text-gray-600 font-mono tracking-widest">
+          <div className="text-center mt-3 text-[10px] text-gray-600 font-mono tracking-widest uppercase">
             NEXORA AI CORE V3.1 • SECURE CONNECTION
           </div>
         </div>
@@ -1077,6 +1157,6 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
 import { 
   MessageSquare, Plus, Compass, History, Users, Palette, 
@@ -73,6 +73,8 @@ export function NexoraChat() {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, 'chats');
     });
 
     return () => unsubscribe();
@@ -222,7 +224,11 @@ export function NexoraChat() {
       if (currentImage) chatData.userImage = currentImage;
       if (generatedImage) chatData.aiImage = generatedImage;
 
-      await addDoc(collection(db, 'chats'), chatData);
+      try {
+        await addDoc(collection(db, 'chats'), chatData);
+      } catch (dbError) {
+        handleFirestoreError(dbError, OperationType.CREATE, 'chats');
+      }
 
     } catch (error) {
       console.error("Error sending message:", error);

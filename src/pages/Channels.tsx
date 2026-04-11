@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Youtube, Instagram, Mail } from 'lucide-react';
+import { Youtube, Instagram, Mail, ShieldAlert } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function Channels() {
   const channels = [
@@ -26,10 +27,10 @@ export function Channels() {
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="min-h-screen bg-black text-white pt-32 px-8 pb-20 relative overflow-hidden flex flex-col items-center justify-center"
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#cc0000]/10 blur-[120px] rounded-full pointer-events-none" />
@@ -62,6 +63,23 @@ export function Channels() {
             </motion.a>
           ))}
         </div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="mt-20 flex justify-center"
+        >
+          <Link 
+            to="/privacy-policy"
+            className="group flex items-center gap-3 px-8 py-4 border border-white/20 bg-black/50 backdrop-blur-sm hover:border-[#cc0000] hover:bg-[#cc0000]/10 transition-all duration-500 rounded-full"
+          >
+            <ShieldAlert className="w-5 h-5 text-gray-400 group-hover:text-[#cc0000] transition-colors duration-500" />
+            <span className="font-display tracking-[0.2em] uppercase text-sm text-gray-300 group-hover:text-white transition-colors duration-500">
+              View Privacy Policy
+            </span>
+          </Link>
+        </motion.div>
       </div>
     </motion.div>
   );

@@ -6,15 +6,17 @@ import { Link } from 'react-router-dom';
 export function Characters() {
   const charactersData = APPS_DATA.filter(app => app.character).map(app => ({
     ...app.character,
-    appId: app.id
+    appId: app.id,
+    appTitle: app.title,
+    appDescription: app.description
   }));
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="min-h-screen bg-black text-white pt-32 px-8 pb-20 relative overflow-hidden"
     >
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#cc0000]/10 blur-[120px] rounded-full pointer-events-none" />
@@ -47,9 +49,17 @@ export function Characters() {
                 </div>
               </div>
               
-              <p className="text-sm text-gray-400 font-sans font-light leading-relaxed text-center max-w-sm mb-6">
-                {char?.description}
-              </p>
+              <div className="text-center max-w-sm mb-6">
+                <p className="text-sm text-gray-300 font-sans font-light leading-relaxed mb-4">
+                  {char?.description}
+                </p>
+                <div className="pt-4 border-t border-white/10">
+                  <h3 className="text-sm font-display text-[#cc0000] mb-2 tracking-widest uppercase">{char?.appTitle}</h3>
+                  <p className="text-xs text-gray-500 font-sans font-light leading-relaxed">
+                    {char?.appDescription}
+                  </p>
+                </div>
+              </div>
               
               <Link to={`/character/${char.appId}`}>
                 <button className="px-6 py-2 border border-[#cc0000]/50 text-[#cc0000] hover:bg-[#cc0000] hover:text-white transition-colors duration-300 font-sans text-xs tracking-widest uppercase">

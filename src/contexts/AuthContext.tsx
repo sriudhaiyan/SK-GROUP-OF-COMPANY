@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
-import { auth, googleProvider } from '../lib/firebase';
+import { auth, googleProvider, handleFirestoreError, OperationType } from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -33,25 +33,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { db } = await import('../lib/firebase');
       
       const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
+      let userSnap;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (error) {
+        handleFirestoreError(error, OperationType.GET, `users/${user.uid}`);
+        return;
+      }
       
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          uid: user.uid,
-          displayName: user.displayName || '',
-          email: user.email || '',
-          photoURL: user.photoURL || '',
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp()
-        });
-      } else {
-        await setDoc(userRef, {
-          lastLogin: serverTimestamp()
-        }, { merge: true });
+      try {
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
+            uid: user.uid,
+            displayName: user.displayName || '',
+            email: user.email || '',
+            photoURL: user.photoURL || '',
+            createdAt: serverTimestamp(),
+            lastLogin: serverTimestamp()
+          });
+        } else {
+          await setDoc(userRef, {
+            lastLogin: serverTimestamp()
+          }, { merge: true });
+        }
+      } catch (error) {
+        handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}`);
       }
       
     } catch (error) {
       console.error("Error signing in with Google", error);
+      throw error;
     }
   };
 

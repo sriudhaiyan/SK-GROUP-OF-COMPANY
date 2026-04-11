@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'motion/react';
 
 export function Auth() {
   const { signInWithGoogle, user } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSignIn = async () => {
+    try {
+      setError(null);
+      await signInWithGoogle();
+    } catch (err: any) {
+      setError(err.message || "Failed to sign in");
+    }
+  };
 
   if (user) {
     return (
@@ -60,12 +70,18 @@ export function Auth() {
         <p className="text-gray-400 mb-8">Sign in to access the ecosystem</p>
         
         <button 
-          onClick={signInWithGoogle}
+          onClick={handleSignIn}
           className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black rounded-xl font-bold hover:bg-gray-200 transition-colors"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-6 h-6" />
           Sign in with Google
         </button>
+        
+        {error && (
+          <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 rounded-lg text-red-200 text-sm overflow-auto max-h-32">
+            {error}
+          </div>
+        )}
         
         <div className="mt-8 text-xs text-gray-500">
           By signing in, you agree to our Terms & Policy and User Agreement.

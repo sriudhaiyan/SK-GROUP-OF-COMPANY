@@ -1,0 +1,327 @@
+.planetarium-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #050505;
+  z-index: 100;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  color: white;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  z-index: 1000;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.close-btn:hover {
+  opacity: 1;
+}
+
+.planetarium-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1000px;
+}
+
+.logo {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  z-index: 10;
+}
+
+.logo span {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #888;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Hide all inputs */
+input[type="radio"] {
+  display: none;
+}
+
+/* Menu Container */
+.menu-container {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 10;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.menu:hover {
+  opacity: 0.8;
+}
+
+.menu .preview {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5);
+}
+
+.menu .info h2 {
+  font-size: 14px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.menu .info .pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: none;
+}
+
+.menu .info h3 {
+  font-size: 10px;
+  color: #888;
+  margin: 2px 0 0 0;
+}
+
+/* Solar System */
+.solar {
+  position: absolute;
+  top: 50%;
+  left: 40%;
+  transform: translate(-50%, -50%) rotateX(60deg);
+  width: 800px;
+  height: 800px;
+  transform-style: preserve-3d;
+}
+
+.solar_systm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 50%;
+  transform-style: preserve-3d;
+}
+
+/* Base orbits */
+.solar_systm:nth-child(1) { width: 150px; height: 150px; }
+.solar_systm:nth-child(2) { width: 250px; height: 250px; }
+.solar_systm:nth-child(3) { width: 350px; height: 350px; }
+.solar_systm:nth-child(4) { width: 450px; height: 450px; }
+.solar_systm:nth-child(5) { width: 550px; height: 550px; }
+.solar_systm:nth-child(6) { width: 650px; height: 650px; }
+.solar_systm:nth-child(7) { width: 750px; height: 750px; }
+.solar_systm:nth-child(8) { width: 850px; height: 850px; }
+.solar_systm:nth-child(9) { width: 950px; height: 950px; }
+
+.planet {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%) rotateX(-60deg);
+  border-radius: 50%;
+  box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8), 0 0 10px rgba(255,255,255,0.2);
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+
+/* Planet sizes */
+.mercury-planet { width: 12px; height: 12px; }
+.venus-planet { width: 20px; height: 20px; }
+.earth-planet { width: 22px; height: 22px; }
+.mars-planet { width: 16px; height: 16px; }
+.jupiter-planet { width: 50px; height: 50px; }
+.saturn-planet { width: 40px; height: 40px; }
+.uranus-planet { width: 30px; height: 30px; }
+.neptune-planet { width: 28px; height: 28px; }
+.pluto-planet { width: 10px; height: 10px; }
+
+.planet_description {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  margin-left: 20px;
+  width: 250px;
+  background: rgba(0,0,0,0.8);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.planet_description h2 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.planet_description p {
+  font-size: 14px;
+  color: #aaa;
+  line-height: 1.5;
+  margin: 0 0 15px 0;
+}
+
+.planet_description label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: white;
+  color: black;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Active States based on Radio Inputs */
+#mercury:checked ~ .menu-container .mercury,
+#venus:checked ~ .menu-container .venus,
+#earth:checked ~ .menu-container .earth,
+#mars:checked ~ .menu-container .mars,
+#jupiter:checked ~ .menu-container .jupiter,
+#saturn:checked ~ .menu-container .saturn,
+#uranus:checked ~ .menu-container .uranus,
+#neptune:checked ~ .menu-container .neptune,
+#pluto:checked ~ .menu-container .pluto {
+  opacity: 1;
+}
+
+#mercury:checked ~ .menu-container .mercury .info .pip,
+#venus:checked ~ .menu-container .venus .info .pip,
+#earth:checked ~ .menu-container .earth .info .pip,
+#mars:checked ~ .menu-container .mars .info .pip,
+#jupiter:checked ~ .menu-container .jupiter .info .pip,
+#saturn:checked ~ .menu-container .saturn .info .pip,
+#uranus:checked ~ .menu-container .uranus .info .pip,
+#neptune:checked ~ .menu-container .neptune .info .pip,
+#pluto:checked ~ .menu-container .pluto .info .pip {
+  display: block;
+}
+
+/* Focus planet */
+#mercury:checked ~ .solar .mercury-planet .planet_description,
+#venus:checked ~ .solar .venus-planet .planet_description,
+#earth:checked ~ .solar .earth-planet .planet_description,
+#mars:checked ~ .solar .mars-planet .planet_description,
+#jupiter:checked ~ .solar .jupiter-planet .planet_description,
+#saturn:checked ~ .solar .saturn-planet .planet_description,
+#uranus:checked ~ .solar .uranus-planet .planet_description,
+#neptune:checked ~ .solar .neptune-planet .planet_description,
+#pluto:checked ~ .solar .pluto-planet .planet_description {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#mercury:checked ~ .solar .mercury-planet,
+#venus:checked ~ .solar .venus-planet,
+#earth:checked ~ .solar .earth-planet,
+#mars:checked ~ .solar .mars-planet,
+#jupiter:checked ~ .solar .jupiter-planet,
+#saturn:checked ~ .solar .saturn-planet,
+#uranus:checked ~ .solar .uranus-planet,
+#neptune:checked ~ .solar .neptune-planet,
+#pluto:checked ~ .solar .pluto-planet {
+  transform: translate(-50%, -50%) rotateX(-60deg) scale(2);
+  z-index: 100;
+}
+
+/* Read More Panels */
+.panel {
+  position: absolute;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.95);
+  border-left: 1px solid rgba(255,255,255,0.1);
+  transition: right 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+  z-index: 200;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.panel-content h2 {
+  font-size: 32px;
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+}
+
+.panel-content p {
+  color: #ccc;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.close-panel {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid white;
+  color: white;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.close-panel:hover {
+  background: white;
+  color: black;
+}
+
+.closeBig {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 199;
+  display: none;
+}
+
+/* Panel logic */
+.read:checked + .closeBig {
+  display: block;
+}
+
+.read:checked + .closeBig + .panel {
+  right: 0;
+}

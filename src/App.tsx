@@ -15,6 +15,8 @@ import { Channels } from './pages/Channels';
 import { AppDetails } from './pages/AppDetails';
 import { CharacterDetails } from './pages/CharacterDetails';
 import { NexoraAI } from './pages/NexoraAI';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { Planetarium } from './pages/Planetarium';
 import { DashboardNav } from './components/DashboardNav';
 import { OrbixBot } from './components/OrbixBot';
 import { CharacterChat } from './components/CharacterChat';
@@ -45,10 +47,12 @@ function AnimatedRoutes() {
         <Route path="/news" element={<ProtectedRoute><News /></ProtectedRoute>} />
         <Route path="/apps" element={<ProtectedRoute><AppsList /></ProtectedRoute>} />
         <Route path="/characters" element={<ProtectedRoute><Characters /></ProtectedRoute>} />
+        <Route path="/planetarium" element={<ProtectedRoute><Planetarium /></ProtectedRoute>} />
         <Route path="/character/:id" element={<ProtectedRoute><CharacterDetails /></ProtectedRoute>} />
         <Route path="/channels" element={<ProtectedRoute><Channels /></ProtectedRoute>} />
         <Route path="/app/:id" element={<ProtectedRoute><AppDetails /></ProtectedRoute>} />
         <Route path="/nexora" element={<ProtectedRoute><NexoraAI /></ProtectedRoute>} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </AnimatePresence>
   );
@@ -60,11 +64,14 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={null} />
+          <Route path="/nexora" element={null} />
+          <Route path="/privacy-policy" element={null} />
           <Route path="*" element={<DashboardNav />} />
         </Routes>
         <AnimatedRoutes />
         <Routes>
           <Route path="/auth" element={null} />
+          <Route path="/privacy-policy" element={null} />
           <Route path="*" element={
             <>
               <OrbixBot />

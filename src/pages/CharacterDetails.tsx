@@ -45,10 +45,10 @@ export function CharacterDetails() {
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.8, ease: "easeInOut" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`min-h-screen ${theme.bg} text-white pt-32 px-8 pb-20 relative overflow-hidden transition-colors duration-1000`}
     >
       <div 
@@ -116,16 +116,11 @@ export function CharacterDetails() {
           </h1>
           
           <h3 
-            className={`text-sm ${theme.fontSans} font-light mb-8 tracking-[0.4em] uppercase transition-colors duration-1000`}
+            className={`text-sm ${theme.fontSans} font-light mb-4 tracking-[0.4em] uppercase transition-colors duration-1000`}
             style={{ color: theme.primary }}
           >
             {char.role}
           </h3>
-          
-          <div 
-            className="w-16 h-px mb-8 transition-colors duration-1000" 
-            style={{ backgroundImage: `linear-gradient(to right, ${theme.primary}, transparent)` }}
-          />
           
           <p className={`text-base text-gray-300 leading-loose ${theme.fontSans} font-light tracking-wide mb-8`}>
             {char.description}

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { LogOut, User } from 'lucide-react';
@@ -103,6 +104,20 @@ const GallerySection = () => {
                 />
               </div>
             ))}
+          </div>
+
+          <div className="mt-24 flex flex-col items-center justify-center text-center">
+            <p className="text-gray-300 font-sans text-lg md:text-xl tracking-wide leading-relaxed max-w-3xl mx-auto mb-16 italic drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+              "This website is just the beginning. Curious about the full mastery behind the craft? Explore the S-Rank capabilities that set SK apart by clicking below."
+            </p>
+            <Link to="/planetarium" className="block">
+              <div className="portal">
+                <div className="ring ring1"></div>
+                <div className="ring ring2"></div>
+                <div className="ring ring3"></div>
+                <div className="core"></div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
@@ -425,10 +440,10 @@ export function Home() {
     <div className="wrapper">
       <motion.div 
         ref={containerRef} 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className="w-full bg-black text-white relative"
       >
         <div className="scrollElement" />
