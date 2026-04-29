@@ -282,23 +282,22 @@ body label.menu:nth-of-type(9) {
 body input.read {
   display: none;
 }
-body .read:checked + label + input + .panel {
+body .panel.active {
   right: 0;
 }
-body .read:checked + label {
+body .closeBig.active {
   width: calc(100% - 420px);
+  opacity: 1;
+  transition: all 0.3s 0.6s;
 }
-body .read:checked + label::after {
+body .closeBig.active::after {
   opacity: 1;
   left: 0;
 }
-body .read:checked + label + label {
-  transition: all 0.3s 0.6s;
-  opacity: 1;
-}
-body .read:not(:checked) + label + label {
-  transition: all 0.3s 0s;
+body .closeBig:not(.active) {
+  width: 0;
   opacity: 0;
+  transition: all 0.3s 0s;
 }
 body label.close {
   position: absolute;
@@ -308,7 +307,7 @@ body label.close {
   z-index: 3;
   top: 65px;
 }
-body label.closeBig {
+body .closeBig {
   position: absolute;
   top: 0;
   left: 0;
@@ -319,7 +318,7 @@ body label.closeBig {
   width: 0;
   background: rgba(56, 37, 99, 0.38);
 }
-body label.closeBig::after {
+body .closeBig::after {
   content: "Back";
   text-align: center;
   font-size: 30px;
@@ -344,6 +343,7 @@ body .overlay {
   border-radius: 100%;
   z-index: 0;
   box-shadow: 0px -190px 215px 110px black inset;
+  pointer-events: none;
 }
 body input[type=radio][name=planet] {
   appearance: none;
@@ -358,7 +358,7 @@ body input[type=radio][name=planet].planet1:checked + label + input::after {
   display: none;
 }
 body input[type=radio][name=planet].planet1:checked + label + div .solar_systm:nth-of-type(1) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet1:checked + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(0px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -493,7 +493,7 @@ body input[type=radio][name=planet].planet2:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet2:checked + label + input + label + div .solar_systm:nth-of-type(2) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet2:checked + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(2300px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -631,7 +631,7 @@ body input[type=radio][name=planet].planet3:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet3:checked + label + input + label + input + label + div .solar_systm:nth-of-type(3) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet3:checked + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(4600px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -772,7 +772,7 @@ body input[type=radio][name=planet].planet4:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet4:checked + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(4) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet4:checked + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(6900px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -916,7 +916,7 @@ body input[type=radio][name=planet].planet5:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet5:checked + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(5) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet5:checked + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(9200px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -1063,7 +1063,7 @@ body input[type=radio][name=planet].planet6:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet6:checked + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(6) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet6:checked + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(11500px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -1213,7 +1213,7 @@ body input[type=radio][name=planet].planet7:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet7:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(7) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet7:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(13800px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -1366,7 +1366,7 @@ body input[type=radio][name=planet].planet8:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet8:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(8) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet8:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(16100px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -1522,7 +1522,7 @@ body input[type=radio][name=planet].planet9:checked + label + input + label + in
   display: none;
 }
 body input[type=radio][name=planet].planet9:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(9) {
-  pointer-events: all;
+  pointer-events: auto;
 }
 body input[type=radio][name=planet].planet9:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm:nth-of-type(1) .planet {
   transform: translateZ(18400px) translateY(0) rotatex(4deg) scaleX(0.89);
@@ -2085,13 +2085,20 @@ body .solar_systm .planet_description {
   position: absolute;
   margin: auto;
   left: 0;
-  z-index: 2;
   right: 0;
   color: white;
   font-weight: 100;
   transition: all 0.4s 0s;
   text-transform: uppercase;
-  z-index: 1;
+  z-index: 10 !important;
+  pointer-events: none !important;
+  transform: translateZ(100px);
+}
+body .solar_systm .planet_description h1,
+body .solar_systm .planet_description h2,
+body .solar_systm .planet_description p,
+body .solar_systm .planet_description .read-more {
+  pointer-events: auto !important;
 }
 body .solar_systm .planet_description.mercury a {
   color: #E8927C;
@@ -2565,10 +2572,10 @@ body .panel {
   background: transparent !important;
   box-shadow: none !important;
 }
-body .read:checked + label + input + .panel {
+body .panel.active {
   right: 0 !important;
 }
-body .read:checked + label {
+body .closeBig.active {
   width: calc(100% - 400px) !important;
 }
 
@@ -2579,16 +2586,103 @@ body .panel {
   right: -550px !important;
   height: 100vh !important;
 }
-body .read:checked + label + input + .panel {
+body .panel.active {
   right: 0 !important;
 }
-body label.closeBig {
+body .closeBig {
   z-index: 999 !important;
   position: fixed !important;
+  cursor: pointer;
 }
 .planet_description label {
-  pointer-events: auto !important;
   cursor: pointer !important;
   position: relative;
   z-index: 100;
 }
+
+
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  body .solar { transform: rotatex(-20deg) scale(0.8); transform-origin: center center; }
+  body .menu {
+    right: 20px;
+    width: 250px;
+  }
+  body .logo {
+    left: 20px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  body .solar { transform: rotatex(-20deg) scale(0.6); transform-origin: center center; }
+  body .menu {
+    right: 10px;
+    width: 200px;
+    padding: 10px;
+  }
+  body .menu .info h2 {
+    font-size: 12px;
+  }
+  body .menu .info h3 {
+    font-size: 8px;
+  }
+  body .menu .preview {
+    width: 30px;
+    height: 30px;
+  }
+  body .solar_systm .planet_description { transform: scale(1.66) translateZ(100px); transform-origin: center top; }
+  body .solar_systm .planet_description h1 {
+    font-size: 30px;
+  }
+  body .solar_systm .planet_description p {
+    font-size: 12px;
+  }
+  .card-container {
+    width: 90%;
+    height: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  body .solar { transform: rotatex(-20deg) scale(0.4); transform-origin: center center; }
+  body .menu {
+    right: 5px;
+    width: 150px;
+    padding: 5px;
+  }
+  body .menu .info h2 {
+    font-size: 10px;
+  }
+  body .menu .info h3 {
+    font-size: 7px;
+  }
+  body .menu .preview {
+    width: 20px;
+    height: 20px;
+  }
+  body .solar_systm .planet_description { transform: scale(2.5) translateZ(100px); transform-origin: center top; }
+  body .solar_systm .planet_description h1 {
+    font-size: 24px;
+  }
+  body .solar_systm .planet_description h2 {
+    font-size: 10px;
+  }
+  body .solar_systm .planet_description p {
+    font-size: 10px;
+  }
+  .card-container {
+    width: 95%;
+    height: 90%;
+  }
+  .content-top .title {
+    font-size: 24px;
+  }
+}
+
+.read-more, .read-more a { cursor: pointer !important; position: relative; z-index: 9999 !important; pointer-events: auto !important; }
+
+body .solar_systm .planet_description .read-more a { display: inline-block; margin-top: 20px; padding: 10px 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; color: white; text-transform: uppercase; letter-spacing: 2px; font-size: 12px; transition: all 0.3s; }
+
+body .solar_systm .planet_description .read-more a:hover { background: rgba(255, 255, 255, 0.3); }

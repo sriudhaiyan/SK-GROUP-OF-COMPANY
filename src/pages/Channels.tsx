@@ -68,7 +68,7 @@ export function Channels() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="mt-20 flex justify-center"
+          className="mt-20 flex flex-col sm:flex-row justify-center gap-6"
         >
           <Link 
             to="/privacy-policy"
@@ -77,6 +77,15 @@ export function Channels() {
             <ShieldAlert className="w-5 h-5 text-gray-400 group-hover:text-[#cc0000] transition-colors duration-500" />
             <span className="font-display tracking-[0.2em] uppercase text-sm text-gray-300 group-hover:text-white transition-colors duration-500">
               View Privacy Policy
+            </span>
+          </Link>
+          <Link 
+            to="/terms-and-conditions"
+            className="group flex items-center gap-3 px-8 py-4 border border-white/20 bg-black/50 backdrop-blur-sm hover:border-[#cc0000] hover:bg-[#cc0000]/10 transition-all duration-500 rounded-full"
+          >
+            <ShieldAlert className="w-5 h-5 text-gray-400 group-hover:text-[#cc0000] transition-colors duration-500" />
+            <span className="font-display tracking-[0.2em] uppercase text-sm text-gray-300 group-hover:text-white transition-colors duration-500">
+              Terms & Conditions
             </span>
           </Link>
         </motion.div>

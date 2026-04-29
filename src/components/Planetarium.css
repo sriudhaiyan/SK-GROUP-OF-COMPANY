@@ -266,8 +266,8 @@ input[type="radio"] {
 .panel {
   position: absolute;
   top: 0;
-  right: -400px;
-  width: 400px;
+  right: -450px;
+  width: 450px;
   height: 100%;
   background: rgba(10, 10, 10, 0.95);
   border-left: 1px solid rgba(255,255,255,0.1);
@@ -275,6 +275,10 @@ input[type="radio"] {
   z-index: 200;
   padding: 40px;
   box-sizing: border-box;
+}
+
+.panel.panel-open {
+  right: 0;
 }
 
 .panel-content h2 {
@@ -293,6 +297,7 @@ input[type="radio"] {
   display: inline-block;
   padding: 10px 20px;
   border: 1px solid white;
+  background: transparent;
   color: white;
   text-transform: uppercase;
   font-size: 12px;
@@ -317,11 +322,89 @@ input[type="radio"] {
   display: none;
 }
 
-/* Panel logic */
-.read:checked + .closeBig {
-  display: block;
+.read-more-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: white;
+  color: black;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  pointer-events: auto;
 }
 
-.read:checked + .closeBig + .panel {
-  right: 0;
+.read-more-btn:hover {
+  background: #e5e5e5;
+  transform: scale(1.05);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Responsive Design for Planetarium */
+@media (max-width: 768px) {
+  .logo {
+    top: 15px;
+    left: 15px;
+    font-size: 16px;
+  }
+  
+  .logo img {
+    height: 30px;
+  }
+
+  .menu-container {
+    right: 15px;
+    top: auto;
+    bottom: 20px;
+    transform: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: calc(100% - 30px);
+    gap: 10px;
+  }
+
+  .menu {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .menu .info {
+    display: none; /* Hide text on small screens to save space */
+  }
+
+  .planet {
+    width: 200px;
+    height: 200px;
+    margin-top: -100px;
+    margin-left: -100px;
+  }
+
+  .panel {
+    width: 100%;
+    right: -100%;
+    padding: 20px;
+    padding-top: 60px; /* Space for close button */
+  }
+
+  .panel-content h2 {
+    font-size: 24px;
+  }
 }

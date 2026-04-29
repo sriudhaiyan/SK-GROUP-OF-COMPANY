@@ -16,10 +16,12 @@ import { AppDetails } from './pages/AppDetails';
 import { CharacterDetails } from './pages/CharacterDetails';
 import { NexoraAI } from './pages/NexoraAI';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsAndConditions } from './pages/TermsAndConditions';
 import { Planetarium } from './pages/Planetarium';
 import { DashboardNav } from './components/DashboardNav';
 import { OrbixBot } from './components/OrbixBot';
 import { CharacterChat } from './components/CharacterChat';
+import { BackButton } from './components/BackButton';
 import { AnimatePresence } from 'motion/react';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -53,6 +55,7 @@ function AnimatedRoutes() {
         <Route path="/app/:id" element={<ProtectedRoute><AppDetails /></ProtectedRoute>} />
         <Route path="/nexora" element={<ProtectedRoute><NexoraAI /></ProtectedRoute>} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       </Routes>
     </AnimatePresence>
   );
@@ -62,16 +65,19 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <BackButton />
         <Routes>
           <Route path="/auth" element={null} />
           <Route path="/nexora" element={null} />
           <Route path="/privacy-policy" element={null} />
+          <Route path="/terms-and-conditions" element={null} />
           <Route path="*" element={<DashboardNav />} />
         </Routes>
         <AnimatedRoutes />
         <Routes>
           <Route path="/auth" element={null} />
           <Route path="/privacy-policy" element={null} />
+          <Route path="/terms-and-conditions" element={null} />
           <Route path="*" element={
             <>
               <OrbixBot />

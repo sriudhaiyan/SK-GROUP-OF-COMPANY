@@ -2,6 +2,7 @@ import React from 'react';
 import { APPS_DATA } from '../data/content';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { SpaceShuttleButton } from '../components/SpaceShuttleButton';
 
 export function AppsList() {
   return (
@@ -15,9 +16,13 @@ export function AppsList() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#cc0000]/10 blur-[120px] rounded-full pointer-events-none" />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <h1 className="text-5xl md:text-7xl font-display mb-16 tracking-[0.15em] uppercase text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+        <h1 className="text-5xl md:text-7xl font-display mb-8 tracking-[0.15em] uppercase text-center drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
           Our <span className="text-[#cc0000]">Applications</span>
         </h1>
+
+        <div className="flex justify-center mb-16">
+          <SpaceShuttleButton />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {APPS_DATA.filter(app => app.id !== 'intro' && app.type !== 'character').map((app, index) => (

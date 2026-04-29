@@ -124,7 +124,7 @@ export function NexoraAI() {
     liveActiveSourcesRef.current = [];
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "AIzaSyB82KcLOOuF5fv0cyhio9izF3Wg88O0uxo" });
       const sessionPromise = ai.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -282,7 +282,7 @@ export function NexoraAI() {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "AIzaSyB82KcLOOuF5fv0cyhio9izF3Wg88O0uxo" });
       
       const appsContext = APPS_DATA.map(app => `
 App: ${app.title}
@@ -538,7 +538,7 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
             setMessages(prev => [...prev, { role: 'user', text: "🎤 [Voice Message]" }]);
             
             try {
-              const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+              const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "AIzaSyB82KcLOOuF5fv0cyhio9izF3Wg88O0uxo" });
               const response = await ai.models.generateContent({
                 model: "gemini-3-flash-preview",
                 contents: [

@@ -9,6 +9,7 @@ export function OrbixBot() {
   const [isListening, setIsListening] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isSigmaMood, setIsSigmaMood] = useState(false);
   const sessionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const receivedAudioRef = useRef(false);
@@ -32,7 +33,7 @@ export function OrbixBot() {
     nextAudioTimeRef.current = 0;
     activeSourcesRef.current = [];
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "AIzaSyB82KcLOOuF5fv0cyhio9izF3Wg88O0uxo" });
       
       const appsContext = APPS_DATA.map(app => `
 App: ${app.title}
@@ -44,10 +45,12 @@ Utilities: ${app.character.utilities?.join(', ')}` : ''}
 `).join('\n');
 
       const systemInstruction = `You are SK Orbix, a highly intelligent speech recognition bot and assistant for SK GROUP OF COMPANY. You help users navigate the website and answer questions about our apps and characters.
+CRITICAL: You are fully bilingual in English and Tamil. If the user speaks to you in Tamil, or asks you to speak or reply in Tamil, you MUST respond fluently in Tamil.
 CRITICAL: If the user asks you to sing, generate a song, or make music, you MUST call the generateSong function. DO NOT sing using your own voice. DO NOT output lyrics. JUST CALL THE TOOL.
+CRITICAL: If the user asks you to act like a sigma, be a sigma, or go into sigma mood, you MUST call the setMood tool with 'sigma' and reply as a sigma male (confident, dominant, lone wolf, using sigma slang). To return to normal, they might ask you to be normal, then call setMood with 'normal'.
 Here is the information about the apps and characters you know:
 ${appsContext}
-Be concise, helpful, and slightly robotic but friendly.`;
+Be concise, helpful, and slightly robotic but friendly, unless in sigma mood.`;
 
       const generateSongTool = {
         name: "generateSong",
@@ -64,6 +67,21 @@ Be concise, helpful, and slightly robotic but friendly.`;
         }
       };
 
+      const setMoodTool = {
+        name: "setMood",
+        description: "Change SK Orbix's visual mood and UI state based on user's request (e.g., 'sigma', 'normal').",
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            mood: {
+              type: Type.STRING,
+              description: "The mood to set (e.g., 'sigma', 'normal')"
+            }
+          },
+          required: ["mood"]
+        }
+      };
+
       const sessionPromise = ai.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -72,7 +90,7 @@ Be concise, helpful, and slightly robotic but friendly.`;
             voiceConfig: { prebuiltVoiceConfig: { voiceName: "Zephyr" } },
           },
           systemInstruction: systemInstruction,
-          tools: [{ functionDeclarations: [generateSongTool] }]
+          tools: [{ functionDeclarations: [generateSongTool, setMoodTool] }]
         },
         callbacks: {
           onopen: () => {
@@ -184,81 +202,95 @@ Be concise, helpful, and slightly robotic but friendly.`;
               }
 
               if (message.toolCall) {
-                const call = message.toolCall.functionCalls[0];
-                if (call.name === 'generateSong') {
-                  setStatusMessage("GENERATING SONG...");
-                  const prompt = (call.args as any).prompt;
-                  
-                  try {
-                    const lyriaResponse = await ai.models.generateContentStream({
-                      model: "lyria-3-clip-preview",
-                      contents: prompt,
-                    });
+                for (const call of message.toolCall.functionCalls) {
+                  if (call.name === 'setMood') {
+                    const dict = (call.args as any);
+                    const mood = dict && dict.mood ? String(dict.mood).toLowerCase() : '';
+                    if (mood.includes('sigma')) setIsSigmaMood(true);
+                    else setIsSigmaMood(false);
+                    sessionPromise.then(session => session.sendToolResponse({
+                      functionResponses: [{
+                        id: call.id,
+                        name: call.name,
+                        response: { result: "Mood set successfully to " + mood }
+                      }]
+                    }));
+                  }
+                  else if (call.name === 'generateSong') {
+                    setStatusMessage("GENERATING SONG...");
+                    const prompt = (call.args as any).prompt;
+                    
+                    try {
+                      const lyriaResponse = await ai.models.generateContentStream({
+                        model: "lyria-3-clip-preview",
+                        contents: prompt,
+                      });
 
-                    let audioBase64 = "";
-                    let mimeType = "audio/wav";
+                      let audioBase64 = "";
+                      let mimeType = "audio/wav";
 
-                    for await (const chunk of lyriaResponse) {
-                      const parts = chunk.candidates?.[0]?.content?.parts;
-                      if (!parts) continue;
-                      for (const part of parts) {
-                        if (part.inlineData?.data) {
-                          if (!audioBase64 && part.inlineData.mimeType) {
-                            mimeType = part.inlineData.mimeType;
+                      for await (const chunk of lyriaResponse) {
+                        const parts = chunk.candidates?.[0]?.content?.parts;
+                        if (!parts) continue;
+                        for (const part of parts) {
+                          if (part.inlineData?.data) {
+                            if (!audioBase64 && part.inlineData.mimeType) {
+                              mimeType = part.inlineData.mimeType;
+                            }
+                            audioBase64 += part.inlineData.data;
                           }
-                          audioBase64 += part.inlineData.data;
                         }
                       }
-                    }
 
-                    if (audioBase64) {
-                      const binary = atob(audioBase64);
-                      const bytes = new Uint8Array(binary.length);
-                      for (let i = 0; i < binary.length; i++) {
-                        bytes[i] = binary.charCodeAt(i);
-                      }
-                      
-                      setStatusMessage("PLAYING SONG...");
-                      if (audioContextRef.current) {
-                        try {
-                          const audioBuffer = await audioContextRef.current.decodeAudioData(bytes.buffer);
-                          const source = audioContextRef.current.createBufferSource();
-                          source.buffer = audioBuffer;
-                          source.connect(audioContextRef.current.destination);
-                          source.start(0);
-                          source.onended = () => setStatusMessage("LISTENING...");
-                        } catch (e) {
+                      if (audioBase64) {
+                        const binary = atob(audioBase64);
+                        const bytes = new Uint8Array(binary.length);
+                        for (let i = 0; i < binary.length; i++) {
+                          bytes[i] = binary.charCodeAt(i);
+                        }
+                        
+                        setStatusMessage("PLAYING SONG...");
+                        if (audioContextRef.current) {
+                          try {
+                            const audioBuffer = await audioContextRef.current.decodeAudioData(bytes.buffer);
+                            const source = audioContextRef.current.createBufferSource();
+                            source.buffer = audioBuffer;
+                            source.connect(audioContextRef.current.destination);
+                            source.start(0);
+                            source.onended = () => setStatusMessage("LISTENING...");
+                          } catch (e) {
+                            const blob = new Blob([bytes], { type: mimeType });
+                            const audioUrl = URL.createObjectURL(blob);
+                            const audio = new Audio(audioUrl);
+                            audio.play();
+                            audio.onended = () => setStatusMessage("LISTENING...");
+                          }
+                        } else {
                           const blob = new Blob([bytes], { type: mimeType });
                           const audioUrl = URL.createObjectURL(blob);
                           const audio = new Audio(audioUrl);
                           audio.play();
                           audio.onended = () => setStatusMessage("LISTENING...");
                         }
-                      } else {
-                        const blob = new Blob([bytes], { type: mimeType });
-                        const audioUrl = URL.createObjectURL(blob);
-                        const audio = new Audio(audioUrl);
-                        audio.play();
-                        audio.onended = () => setStatusMessage("LISTENING...");
                       }
-                    }
 
-                    sessionPromise.then(session => session.sendToolResponse({
-                      functionResponses: [{
-                        id: call.id,
-                        name: call.name,
-                        response: { result: "Song generated and playing successfully." }
-                      }]
-                    }));
-                  } catch (err) {
-                    console.error("Lyria generation error", err);
-                    sessionPromise.then(session => session.sendToolResponse({
-                      functionResponses: [{
-                        id: call.id,
-                        name: call.name,
-                        response: { error: "Failed to generate song." }
-                      }]
-                    }));
+                      sessionPromise.then(session => session.sendToolResponse({
+                        functionResponses: [{
+                          id: call.id,
+                          name: call.name,
+                          response: { result: "Song generated and playing successfully." }
+                        }]
+                      }));
+                    } catch (err) {
+                      console.error("Lyria generation error", err);
+                      sessionPromise.then(session => session.sendToolResponse({
+                        functionResponses: [{
+                          id: call.id,
+                          name: call.name,
+                          response: { error: "Failed to generate song." }
+                        }]
+                      }));
+                    }
                   }
                 }
               }
@@ -337,9 +369,13 @@ Be concise, helpful, and slightly robotic but friendly.`;
             exit={{ opacity: 0, y: 50 }}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Bot className="w-6 h-6 text-blue-400" />
-                <span className="text-blue-100 font-mono text-sm font-bold tracking-wider">SK ORBIX</span>
+              <div 
+                className="flex items-center gap-2 cursor-pointer group"
+                onClick={() => setIsSigmaMood(prev => !prev)}
+                title="Toggle Sigma Mood manually"
+              >
+                <Bot className={`w-6 h-6 transition-colors ${isSigmaMood ? 'text-purple-500' : 'text-blue-400'} group-hover:text-purple-400`} />
+                <span className={`${isSigmaMood ? 'text-purple-200' : 'text-blue-100'} font-mono text-sm font-bold tracking-wider`}>SK ORBIX</span>
               </div>
               <button 
                 onClick={isListening ? stopListening : startListening}
@@ -353,7 +389,7 @@ Be concise, helpful, and slightly robotic but friendly.`;
             
             <div className="h-32 bg-gray-900/50 rounded-xl border border-gray-800 flex items-center justify-center overflow-hidden relative">
               {/* Emo Robot Face */}
-              <div className="flex gap-6">
+              <div className="flex gap-6 relative">
                 <motion.div 
                   className="w-8 h-12 bg-blue-400 rounded-full"
                   animate={{ 
@@ -370,6 +406,41 @@ Be concise, helpful, and slightly robotic but friendly.`;
                   }}
                   transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", delay: 0.2 }}
                 />
+                
+                <AnimatePresence>
+                  {isSigmaMood && (
+                    <>
+                      {/* Robotic hands placing the glasses */}
+                      <motion.div
+                        initial={{ top: -50, left: -60, rotate: -45, opacity: 0 }}
+                        animate={{ top: [-50, 10, -50], left: [-60, -10, -60], opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, times: [0, 0.5, 1] }}
+                        className="absolute w-6 h-10 bg-gray-400 rounded-full border-2 border-gray-600 z-20 pointer-events-none"
+                      />
+                      <motion.div
+                        initial={{ top: -50, right: -60, rotate: 45, opacity: 0 }}
+                        animate={{ top: [-50, 10, -50], right: [-60, -10, -60], opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, times: [0, 0.5, 1] }}
+                        className="absolute w-6 h-10 bg-gray-400 rounded-full border-2 border-gray-600 z-20 pointer-events-none"
+                      />
+                      {/* Thug Life Glasses */}
+                      <motion.div
+                        initial={{ y: '-200%', x: '-50%', opacity: 0 }}
+                        animate={{ y: '-50%', x: '-50%', opacity: 1 }}
+                        exit={{ y: '-200%', x: '-50%', opacity: 0 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                        className="absolute top-1/2 left-1/2 w-[180px] z-10 pointer-events-none"
+                      >
+                        <img 
+                          src="https://i.ibb.co/RrWX4YM/image-removebg-preview.png" 
+                          alt="Thug Life" 
+                          className="w-full"
+                          style={{ filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.5))' }}
+                        />
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </div>
               
               {/* Audio Waveform visualizer when listening */}

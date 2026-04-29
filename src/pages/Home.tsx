@@ -1,28 +1,60 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, X } from 'lucide-react';
 import { Fireworks } from '@fireworks-js/react';
 import { FortuneCandle } from '../components/FortuneCandle';
 
 const ProtectedImage = ({ src, alt, wrapperClassName, imageClassName }: { src: string, alt: string, wrapperClassName?: string, imageClassName?: string }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div 
-      className={`relative select-none overflow-hidden ${wrapperClassName || ''}`}
-      onContextMenu={(e) => e.preventDefault()}
-      onDragStart={(e) => e.preventDefault()}
-      style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
-    >
-      <div className="absolute inset-0 z-10" onContextMenu={(e) => e.preventDefault()} />
-      <img 
-        src={src} 
-        alt={alt} 
-        className={`w-full h-full object-cover pointer-events-none ${imageClassName || ''}`} 
-        draggable="false"
-        referrerPolicy="no-referrer"
-      />
-    </div>
+    <>
+      <div 
+        className={`relative select-none overflow-hidden cursor-pointer ${wrapperClassName || ''}`}
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        onClick={() => setIsOpen(true)}
+        style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
+      >
+        <div className="absolute inset-0 z-10" onContextMenu={(e) => e.preventDefault()} />
+        <img 
+          src={src} 
+          alt={alt} 
+          className={`w-full h-full object-cover pointer-events-none ${imageClassName || ''}`} 
+          draggable="false"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+          onContextMenu={(e) => e.preventDefault()}
+          onDragStart={(e) => e.preventDefault()}
+          style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
+        >
+          <button 
+            className="absolute top-6 right-6 text-white/70 hover:text-white z-50"
+            onClick={() => setIsOpen(false)}
+          >
+            <X size={32} />
+          </button>
+          <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center">
+            <div className="absolute inset-0 z-10" onContextMenu={(e) => e.preventDefault()} />
+            <img 
+              src={src} 
+              alt={alt} 
+              className="max-w-full max-h-full object-contain pointer-events-none" 
+              draggable="false"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -130,7 +162,7 @@ const SECTIONS = [
     id: 'intro',
     title: 'SK GROUP OF COMPANY',
     subtitle: 'Enter the Multimodal AI Universe',
-    logo: 'https://i.ibb.co/MyJSD5dk/1763888185441.png',
+    logo: 'https://i.ibb.co/KptDmbVD/SK-GROUP-OF-COMPANY.jpg',
     content: 'Scroll to explore reality bending applications.',
     character: {
       name: 'Shiva',
@@ -144,7 +176,7 @@ const SECTIONS = [
     id: 'bodybuilding',
     title: 'SK BODYBUILDING ARENA',
     subtitle: 'Release Date: 11.11.2026',
-    logo: 'https://i.ibb.co/4w7MrCHq/1759155401800.png',
+    logo: 'https://i.ibb.co/bMWMKmRb/SK-AUTOQUOTES.jpg',
     content: '1. Food Scanner | 2. Daily & Weekly Quests | 3. Special Quest | 4. Chatbot | 5. SK Orbix Bot | 6. Spotify & YT Music | 7. Deep Sleep Alarm | 8. Rank Progress (E to S, V, K) | 9. Rank Progress | 10. Workout Goal | 11. Diet Plan Generator | 12. Anime Characters as Coach | 13. Health Connect | 14. Theme Changing by Gender | 15. Look Maxing Workout with Face Analysis',
     pricing: 'Premium (Razorpay): 1 Mo: ₹15 | 3 Mo: ₹50 | 6 Mo: ₹110 | 1 Yr: ₹250 (First 5 Days). Regular: ₹99 | ₹289 | ₹599 | ₹1199',
     character: {
@@ -159,7 +191,7 @@ const SECTIONS = [
     id: 'studio',
     title: 'SK STUDIO PRO',
     subtitle: 'Release Date: 14.4.2026',
-    logo: 'https://i.ibb.co/sJMGChww/1775207249012.png',
+    logo: 'https://i.ibb.co/8DQVdgjf/SK-AUTOQUOTES.jpg',
     content: '1. Image Quotes with Trending Hashtags | 2. Image Generation Scheduler | 3. Studio for Own Quotes | 4. Gallery | 5. Modes: Paper, Anime Trap, Cinematic | 6. Moods: Sad, Maturity, God, Love, Happy, Attitude, Cameraman | 7. Fonts Selection | 8. Image to Video Generator with Runway | 9. SK Orbix Support',
     pricing: 'Free: 3 Imgs/day | Starter: ₹199/mo (15 Imgs) | Pro: ₹499/mo (Unlimited) | Studio: Highest Tier',
     character: {
@@ -437,7 +469,7 @@ export function Home() {
   const fgY2 = useTransform(smoothProgress, [0, 1], ['0%', '-400%']); // Very fast foreground
 
   return (
-    <div className="wrapper">
+    <div className="wrapper overflow-hidden">
       <motion.div 
         ref={containerRef} 
         initial={{ opacity: 0, y: 20 }}
