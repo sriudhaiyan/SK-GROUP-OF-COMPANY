@@ -33,7 +33,7 @@ export function OrbixBot() {
     nextAudioTimeRef.current = 0;
     activeSourcesRef.current = [];
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "AIzaSyB82KcLOOuF5fv0cyhio9izF3Wg88O0uxo" });
+      const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
       
       const appsContext = APPS_DATA.map(app => `
 App: ${app.title}
