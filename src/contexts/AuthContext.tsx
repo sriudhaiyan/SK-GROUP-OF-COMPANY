@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  updateDisplayName: (name: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,6 +26,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
+      setLoading(true);
+      const { setPersistence, browserLocalPersistence } = await import('firebase/auth');
+      await setPersistence(auth, browserLocalPersistence);
+      
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
@@ -36,20 +41,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       let userSnap;
       try {
         userSnap = await getDoc(userRef);
-      } catch (error) {
-        handleFirestoreError(error, OperationType.GET, `users/${user.uid}`);
-        return;
+      } catch (error: any) {
+        // If it's a network error here, we might want to retry once
+        if (error.code === 'unavailable') {
+          console.warn("Firestore unavailable, retrying...");
+          userSnap = await getDoc(userRef);
+        } else {
+          handleFirestoreError(error, OperationType.GET, `users/${user.uid}`);
+          return;
+        }
       }
       
       try {
-        if (!userSnap.exists()) {
+        if (!userSnap?.exists()) {
           await setDoc(userRef, {
             uid: user.uid,
             displayName: user.displayName || '',
             email: user.email || '',
             photoURL: user.photoURL || '',
             createdAt: serverTimestamp(),
-            lastLogin: serverTimestamp()
+            lastLogin: serverTimestamp(),
+            rank: 'E',
+            subscription: 'free'
           });
         } else {
           await setDoc(userRef, {
@@ -60,8 +73,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         handleFirestoreError(error, OperationType.WRITE, `users/${user.uid}`);
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error signing in with Google", error);
+      if (error.code === 'auth/network-request-failed') {
+        throw new Error("Network connection failed. Please check your internet or disable AdBlockers and try again.");
+      }
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateDisplayName = async (name: string) => {
+    if (!auth.currentUser) return;
+    try {
+      const { updateProfile } = await import('firebase/auth');
+      const { doc, updateDoc } = await import('firebase/firestore');
+      const { db } = await import('../lib/firebase');
+
+      // Update Auth profile
+      await updateProfile(auth.currentUser, { displayName: name });
+      
+      // Update Firestore
+      const userRef = doc(db, 'users', auth.currentUser.uid);
+      try {
+        await updateDoc(userRef, { displayName: name });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.UPDATE, `users/${auth.currentUser.uid}`);
+      }
+
+      // Manually update state to reflect change immediately
+      setUser({ ...auth.currentUser });
+    } catch (error) {
+      console.error("Error updating display name", error);
       throw error;
     }
   };
@@ -75,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, logout, updateDisplayName }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -93,9 +93,9 @@ export function NexoraChat() {
 
   const handleTTS = async (text: string) => {
     try {
-      const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-tts",
+        model: "gemini-3.1-flash-tts-preview",
         contents: [{ parts: [{ text }] }],
         config: {
           responseModalities: [Modality.AUDIO],
@@ -125,7 +125,7 @@ export function NexoraChat() {
 
   const handleGenerateImage = async (prompt: string) => {
     try {
-      const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
       const response = await ai.models.generateContent({
         model: 'gemini-3.1-flash-image-preview',
         contents: { parts: [{ text: prompt }] },
@@ -185,7 +185,7 @@ export function NexoraChat() {
           return newMsgs;
         });
       } else {
-        const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+        const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
         
         const contents: any[] = [];
         if (currentImage) {

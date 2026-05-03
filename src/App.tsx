@@ -6,6 +6,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { MusicProvider } from './contexts/MusicContext';
 import { Home } from './pages/Home';
 import { Auth } from './pages/Auth';
 import { News } from './pages/News';
@@ -18,7 +19,9 @@ import { NexoraAI } from './pages/NexoraAI';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsAndConditions } from './pages/TermsAndConditions';
 import { Planetarium } from './pages/Planetarium';
+import { SkWavelab } from './pages/SkWavelab';
 import { DashboardNav } from './components/DashboardNav';
+import { GlobalPlayer } from './components/GlobalPlayer';
 import { OrbixBot } from './components/OrbixBot';
 import { CharacterChat } from './components/CharacterChat';
 import { BackButton } from './components/BackButton';
@@ -50,6 +53,7 @@ function AnimatedRoutes() {
         <Route path="/apps" element={<ProtectedRoute><AppsList /></ProtectedRoute>} />
         <Route path="/characters" element={<ProtectedRoute><Characters /></ProtectedRoute>} />
         <Route path="/planetarium" element={<ProtectedRoute><Planetarium /></ProtectedRoute>} />
+        <Route path="/wavelab" element={<ProtectedRoute><SkWavelab /></ProtectedRoute>} />
         <Route path="/character/:id" element={<ProtectedRoute><CharacterDetails /></ProtectedRoute>} />
         <Route path="/channels" element={<ProtectedRoute><Channels /></ProtectedRoute>} />
         <Route path="/app/:id" element={<ProtectedRoute><AppDetails /></ProtectedRoute>} />
@@ -64,28 +68,31 @@ function AnimatedRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <BackButton />
-        <Routes>
-          <Route path="/auth" element={null} />
-          <Route path="/nexora" element={null} />
-          <Route path="/privacy-policy" element={null} />
-          <Route path="/terms-and-conditions" element={null} />
-          <Route path="*" element={<DashboardNav />} />
-        </Routes>
-        <AnimatedRoutes />
-        <Routes>
-          <Route path="/auth" element={null} />
-          <Route path="/privacy-policy" element={null} />
-          <Route path="/terms-and-conditions" element={null} />
-          <Route path="*" element={
-            <>
-              <OrbixBot />
-              <CharacterChat />
-            </>
-          } />
-        </Routes>
-      </BrowserRouter>
+      <MusicProvider>
+        <BrowserRouter>
+          <BackButton />
+          <Routes>
+            <Route path="/auth" element={null} />
+            <Route path="/nexora" element={null} />
+            <Route path="/privacy-policy" element={null} />
+            <Route path="/terms-and-conditions" element={null} />
+            <Route path="*" element={<DashboardNav />} />
+          </Routes>
+          <AnimatedRoutes />
+          <Routes>
+            <Route path="/auth" element={null} />
+            <Route path="/privacy-policy" element={null} />
+            <Route path="/terms-and-conditions" element={null} />
+            <Route path="*" element={
+              <>
+                <GlobalPlayer />
+                <OrbixBot />
+                <CharacterChat />
+              </>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </MusicProvider>
     </AuthProvider>
   );
 }

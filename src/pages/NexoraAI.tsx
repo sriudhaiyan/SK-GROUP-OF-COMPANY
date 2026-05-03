@@ -124,7 +124,7 @@ export function NexoraAI() {
     liveActiveSourcesRef.current = [];
 
     try {
-      const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
       const sessionPromise = ai.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -282,7 +282,7 @@ export function NexoraAI() {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
       
       const appsContext = APPS_DATA.map(app => `
 App: ${app.title}
@@ -451,8 +451,8 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
       // Generate TTS
       if (response.text) {
         try {
-          const ttsResponse = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-tts",
+      const ttsResponse = await ai.models.generateContent({
+            model: "gemini-3.1-flash-tts-preview",
             contents: [{ parts: [{ text: response.text.substring(0, 500) }] }],
             config: {
               responseModalities: [Modality.AUDIO],
@@ -538,7 +538,7 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
             setMessages(prev => [...prev, { role: 'user', text: "🎤 [Voice Message]" }]);
             
             try {
-              const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+              const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
               const response = await ai.models.generateContent({
                 model: "gemini-3-flash-preview",
                 contents: [

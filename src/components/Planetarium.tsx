@@ -99,12 +99,12 @@ const PlanetView = ({ p, index, smoothX, smoothY, onReadMore }: { p: any, index:
                 e.stopPropagation();
                 onReadMore(p.id);
               }}
-              className="read-more-btn"
+              className="read-more-btn relative z-20"
             >
               Read More
             </button>
           </div>
-          <div className='overlay'></div>
+          <div className='overlay absolute inset-0 pointer-events-none'></div>
         </div>
       </motion.div>
     </div>

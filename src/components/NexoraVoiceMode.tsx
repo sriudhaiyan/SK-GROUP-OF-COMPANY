@@ -28,7 +28,7 @@ export function NexoraVoiceMode({ onClose }: { onClose: () => void }) {
     setIsConnecting(true);
     setStatusMessage("INITIALIZING CORE...");
     try {
-      const ai = new GoogleGenAI({ apiKey: "proxy_dummy_key", httpOptions: { baseUrl: window.location.protocol + "//" + window.location.host + "/api/proxy" } });
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
       
       const sessionPromise = ai.live.connect({
         model: "gemini-3.1-flash-live-preview",

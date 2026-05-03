@@ -1,21 +1,27 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { LogOut, User, X } from 'lucide-react';
 import { Fireworks } from '@fireworks-js/react';
 import { FortuneCandle } from '../components/FortuneCandle';
 
-const ProtectedImage = ({ src, alt, wrapperClassName, imageClassName }: { src: string, alt: string, wrapperClassName?: string, imageClassName?: string }) => {
+const ProtectedImage = ({ src, alt, wrapperClassName, imageClassName, disableModal = false }: { src: string, alt: string, wrapperClassName?: string, imageClassName?: string, disableModal?: boolean }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleClick = () => {
+    if (!disableModal) {
+      setIsOpen(true);
+    }
+  };
 
   return (
     <>
       <div 
-        className={`relative select-none overflow-hidden cursor-pointer ${wrapperClassName || ''}`}
+        className={`relative select-none overflow-hidden ${!disableModal ? 'cursor-pointer' : ''} ${wrapperClassName || ''}`}
         onContextMenu={(e) => e.preventDefault()}
         onDragStart={(e) => e.preventDefault()}
-        onClick={() => setIsOpen(true)}
+        onClick={handleClick}
         style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
       >
         <div className="absolute inset-0 z-10" onContextMenu={(e) => e.preventDefault()} />
@@ -28,7 +34,7 @@ const ProtectedImage = ({ src, alt, wrapperClassName, imageClassName }: { src: s
         />
       </div>
 
-      {isOpen && (
+      {!disableModal && isOpen && (
         <div 
           className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
@@ -55,6 +61,30 @@ const ProtectedImage = ({ src, alt, wrapperClassName, imageClassName }: { src: s
         </div>
       )}
     </>
+  );
+};
+
+const BluePortal = () => {
+  const [isActive, setIsActive] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    setIsActive(true);
+    setTimeout(() => {
+      navigate('/wavelab');
+    }, 1500);
+  };
+
+  return (
+    <div className="blue-portal-container flex flex-col items-center">
+      <div 
+        className={`blue-portal ${isActive ? 'active' : ''}`} 
+        onClick={handleClick}
+      ></div>
+      <div className="text mt-4 text-[10px] text-blue-400 tracking-[0.4em] uppercase font-bold opacity-80 group-hover:opacity-100 transition-opacity">
+        ENTER SK WAVE LAB
+      </div>
+    </div>
   );
 };
 
@@ -107,7 +137,8 @@ const GallerySection = () => {
                   src={feature.img} 
                   alt={feature.title} 
                   wrapperClassName="w-full h-64 md:h-96"
-                  imageClassName="opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" 
+                  imageClassName="opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                  disableModal={true}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex items-end p-6 md:p-8 pointer-events-none">
                   <h3 className="text-white font-display text-xl md:text-3xl tracking-widest uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">{feature.title}</h3>
@@ -133,23 +164,32 @@ const GallerySection = () => {
                   alt={`About Our King ${i+1}`} 
                   wrapperClassName="w-full h-80 md:h-96"
                   imageClassName="group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" 
+                  disableModal={true}
                 />
               </div>
             ))}
           </div>
 
-          <div className="mt-24 flex flex-col items-center justify-center text-center">
-            <p className="text-gray-300 font-sans text-lg md:text-xl tracking-wide leading-relaxed max-w-3xl mx-auto mb-16 italic drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-              "This website is just the beginning. Curious about the full mastery behind the craft? Explore the S-Rank capabilities that set SK apart by clicking below."
-            </p>
-            <Link to="/planetarium" className="block">
-              <div className="portal">
-                <div className="ring ring1"></div>
-                <div className="ring ring2"></div>
-                <div className="ring ring3"></div>
-                <div className="core"></div>
+          <div className="mt-24 flex flex-col md:flex-row items-center justify-center gap-16 text-center">
+            <div className="flex flex-col items-center">
+              <p className="text-gray-400 font-sans text-sm tracking-widest uppercase mb-8 opacity-60">Mastery Craft</p>
+              <Link to="/planetarium" className="block group">
+                <div className="portal">
+                  <div className="ring ring1"></div>
+                  <div className="ring ring2"></div>
+                  <div className="ring ring3"></div>
+                  <div className="core"></div>
+                </div>
+                <span className="mt-6 block text-[10px] text-gray-500 tracking-[0.4em] uppercase font-bold group-hover:text-white transition-colors">Planetarium</span>
+              </Link>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <p className="text-gray-400 font-sans text-sm tracking-widest uppercase mb-8 opacity-60">Sound Frequency</p>
+              <div className="group">
+                <BluePortal />
               </div>
-            </Link>
+            </div>
           </div>
         </div>
       </div>
