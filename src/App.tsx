@@ -20,6 +20,7 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsAndConditions } from './pages/TermsAndConditions';
 import { Planetarium } from './pages/Planetarium';
 import { SkWavelab } from './pages/SkWavelab';
+import { Dreamforge } from './pages/Dreamforge';
 import { DashboardNav } from './components/DashboardNav';
 import { GlobalPlayer } from './components/GlobalPlayer';
 import { OrbixBot } from './components/OrbixBot';
@@ -54,6 +55,7 @@ function AnimatedRoutes() {
         <Route path="/characters" element={<ProtectedRoute><Characters /></ProtectedRoute>} />
         <Route path="/planetarium" element={<ProtectedRoute><Planetarium /></ProtectedRoute>} />
         <Route path="/wavelab" element={<ProtectedRoute><SkWavelab /></ProtectedRoute>} />
+        <Route path="/dreamforge" element={<ProtectedRoute><Dreamforge /></ProtectedRoute>} />
         <Route path="/character/:id" element={<ProtectedRoute><CharacterDetails /></ProtectedRoute>} />
         <Route path="/channels" element={<ProtectedRoute><Channels /></ProtectedRoute>} />
         <Route path="/app/:id" element={<ProtectedRoute><AppDetails /></ProtectedRoute>} />

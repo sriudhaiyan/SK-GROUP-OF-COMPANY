@@ -9,10 +9,30 @@ export function Auth() {
 
   const handleSignIn = async () => {
     try {
+      // Attempt to prepare for landscape orientation on mobile
+      if (typeof window !== 'undefined' && 'screen' in window && 'orientation' in window.screen) {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            // We can't lock without fullscreen, but we can't request fullscreen without a direct user gesture
+            // This button click IS a gesture, so let's try.
+            await document.documentElement.requestFullscreen().catch(() => {});
+            await (window.screen.orientation as any).lock('landscape').catch(() => {});
+          }
+        } catch (e) {
+          console.log('Orientation lock prep failed:', e);
+        }
+      }
       setError(null);
       await signInWithGoogle();
     } catch (err: any) {
-      setError(err.message || "Failed to sign in");
+      let message = "Failed to sign in";
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed.error) message = parsed.error;
+      } catch {
+        message = err.message || message;
+      }
+      setError(message);
     }
   };
 
@@ -22,19 +42,22 @@ export function Auth() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 1, ease: "easeInOut" }}
-        className="relative h-screen bg-black text-white flex flex-col items-center justify-center overflow-hidden"
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+        className="fixed inset-0 z-[9999] bg-black text-white flex flex-col items-center justify-center overflow-hidden"
       >
         <div className="absolute inset-0 z-0">
-          <iframe
-            src={videoStage === 1 
-              ? "https://www.youtube.com/embed/Qd-Ma0xfETA?si=acL_ck7VRSLIZX4G&controls=0&autoplay=1&mute=1&loop=1"
-              : "https://go.screenpal.com/player/cOhVQlnOLCp?ff=1&ahc=1&dcc=1&tl=1&bg=transparent&share=1&download=1&embed=1&cl=1"
-            }
-            className="w-full h-full border-none"
-            allow="autoplay; encrypted-media; fullscreen"
-            title="SHIVA LATE ARRIVAL"
-          />
+          <div className="relative w-full h-full overflow-hidden">
+            <iframe
+              src={videoStage === 1 
+                ? "https://www.youtube.com/embed/Qd-Ma0xfETA?si=acL_ck7VRSLIZX4G&controls=0&autoplay=1&mute=1&loop=1&vq=hd1080&rel=0&modestbranding=1"
+                : "https://www.youtube.com/embed/9nnDMMmlI78?si=OHthx6gTcJtrhQdH&controls=0&autoplay=1&mute=1&loop=1&vq=hd2160&rel=0&modestbranding=1"
+              }
+              className="absolute top-1/2 left-1/2 w-[115%] h-[115%] -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full pointer-events-none"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              title={videoStage === 1 ? "SHIVA LATE ARRIVAL" : "DREAMFORGE PRODUCTIONS"}
+            />
+            <div className="absolute inset-0 bg-black/20" />
+          </div>
         </div>
 
         <div className="absolute bottom-10 left-0 right-0 z-20 flex justify-center px-4">
@@ -87,7 +110,7 @@ export function Auth() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0 select-none pointer-events-none">
         <img 
-          src="https://i.ibb.co/TMkMBGvh/SHIVA-11-11-11.png"
+          src="https://i.ibb.co/27shk6Fs/take-2.png"
           alt="Shiva Background"
           className="absolute w-full h-full object-cover object-center opacity-60"
           draggable={false}

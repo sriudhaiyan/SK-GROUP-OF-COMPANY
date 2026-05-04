@@ -26,11 +26,25 @@ service cloud.firestore {
     
     // Domain Validators
     function isValidUser() {
-      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'rank', 'subscription', 'createdAt', 'lastLogin']) &&
-             request.resource.data.uid is string &&
-             request.resource.data.email is string &&
-             request.resource.data.createdAt is timestamp &&
-             request.resource.data.lastLogin is timestamp;
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'rank', 'subscription', 'createdAt', 'lastLogin']);
+    }
+
+    function isValidUserCreate() {
+      let data = request.resource.data;
+      return isValidUser() && 
+             data.uid is string && 
+             data.email is string && 
+             data.createdAt is timestamp && 
+             data.lastLogin is timestamp;
+    }
+
+    function isValidUserUpdate() {
+      let data = request.resource.data;
+      return isValidUser() &&
+             (!('uid' in data) || data.uid is string) &&
+             (!('email' in data) || data.email is string) &&
+             (!('createdAt' in data) || data.createdAt is timestamp) &&
+             (!('lastLogin' in data) || data.lastLogin is timestamp);
     }
     
     function isValidChat() {
@@ -46,11 +60,25 @@ service cloud.firestore {
              request.resource.data.timestamp is timestamp;
     }
 
+    function isValidInquiry() {
+      return hasOnlyAllowedFields(['userId', 'userEmail', 'name', 'email', 'message', 'source', 'timestamp']) &&
+             request.resource.data.userId is string &&
+             request.resource.data.name is string &&
+             request.resource.data.name.size() < 200 &&
+             request.resource.data.email is string &&
+             request.resource.data.email.size() < 200 &&
+             request.resource.data.message is string &&
+             request.resource.data.message.size() < 5000 &&
+             (!('source' in request.resource.data) || request.resource.data.source is string) &&
+             (!('userEmail' in request.resource.data) || request.resource.data.userEmail is string) &&
+             request.resource.data.timestamp is timestamp;
+    }
+
     match /users/{userId} {
       allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUser() && uidUnchanged();
-      allow update: if isOwner(userId) && isValidUser() && uidNotModified() && 
-                    request.resource.data.createdAt == resource.data.createdAt;
+      allow create: if isOwner(userId) && isValidUserCreate() && uidUnchanged();
+      allow update: if isOwner(userId) && isValidUserUpdate() && uidNotModified() && 
+                    (!('createdAt' in request.resource.data) || request.resource.data.createdAt == resource.data.createdAt);
     }
     
     match /chats/{chatId} {
@@ -59,6 +87,12 @@ service cloud.firestore {
       allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && isValidChat() &&
                     request.resource.data.userId == resource.data.userId &&
                     request.resource.data.timestamp == resource.data.timestamp;
+    }
+
+    match /inquiries/{inquiryId} {
+      allow read: if false; // Only admin can read from console
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid && isValidInquiry();
+      allow update, delete: if false;
     }
   }
 }

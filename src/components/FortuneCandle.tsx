@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
 const fortunes = [
-  "A great adventure awaits you today.",
-  "Your creativity will lead to unexpected success.",
-  "Trust your instincts; they are guiding you right.",
-  "A pleasant surprise is waiting just around the corner.",
-  "Your hard work is about to pay off brilliantly."
+  "A great adventure awaits you today inside the Dreamforge.",
+  "Your creativity will lead to unexpected success in the SK network.",
+  "Trust your instincts; the digital sovereign is guiding you right.",
+  "A pleasant surprise is hidden within the next cinematic fragment.",
+  "Your hard work is about to pay off with a legendary breakthrough.",
+  "Innovation is the heartbeat of your current journey.",
+  "The SK vision is unfolding before your very eyes.",
+  "Your creative fire burns brighter than a thousand suns today.",
+  "Success in the digital realm is yours to claim.",
+  "The SK network recognizes your true potential.",
+  "Forge your dreams into immersive reality.",
+  "A major breakthrough in animation is coming your way.",
+  "Your imagination is the only limit to your success.",
+  "New horizons are opening in the SK Studio Pro ecosystem.",
+  "The future of design is being written by your hands."
 ];
 
 export function FortuneCandle() {
@@ -13,9 +23,16 @@ export function FortuneCandle() {
   const [isStriking, setIsStriking] = useState(false);
   const [fortune, setFortune] = useState("✨ Click the matchstick to reveal your fortune");
   const [isRevealed, setIsRevealed] = useState(false);
+  const [lastFortuneIndex, setLastFortuneIndex] = useState<number | null>(null);
 
   const lightCandle = () => {
-    if (isLit) return;
+    if (isLit) {
+      // Allow resetting to get a new fortune
+      setIsLit(false);
+      setIsRevealed(false);
+      setIsStriking(false);
+      return;
+    }
     
     setIsStriking(true);
 
@@ -23,8 +40,13 @@ export function FortuneCandle() {
       setIsLit(true);
       
       setTimeout(() => {
-        const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-        setFortune(`✨ ${randomFortune}`);
+        let nextIndex;
+        do {
+          nextIndex = Math.floor(Math.random() * fortunes.length);
+        } while (nextIndex === lastFortuneIndex);
+        
+        setLastFortuneIndex(nextIndex);
+        setFortune(`✨ ${fortunes[nextIndex]}`);
         setIsRevealed(true);
       }, 500);
     }, 500);

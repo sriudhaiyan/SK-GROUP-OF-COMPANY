@@ -30,6 +30,21 @@
         "timestamp": { "type": "timestamp" }
       },
       "required": ["userId", "characterId", "userMessage", "aiResponse", "timestamp"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "A contact submission or business inquiry",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "source": { "type": "string" },
+        "timestamp": { "type": "timestamp" }
+      },
+      "required": ["userId", "name", "email", "message", "timestamp"]
     }
   },
   "firestore": {
@@ -40,6 +55,10 @@
     "/chats/{chatId}": {
       "schema": { "$ref": "#/entities/Chat" },
       "description": "Chat messages"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/Inquiry" },
+      "description": "User inquiries and collaboration proposals"
     }
   }
 }

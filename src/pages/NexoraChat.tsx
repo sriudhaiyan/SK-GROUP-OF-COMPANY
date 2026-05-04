@@ -31,7 +31,7 @@ const CHARACTERS = [
 
 const SYSTEM_INSTRUCTION = `You are NEXORA AI, a highly intelligent core AI assistant for SK GROUP OF COMPANY. 
 Your default language is English, but you can speak and understand any language the user requests.
-You help users navigate the website and answer questions about our apps: SK STUDIO PRO, SK BODYBUILDING ARENA, BACKBENCHER DAILY, PURANANOORU PADAI, and HIRA.
+You help users navigate the website and answer questions about our apps: SK STUDIO PRO, SK BODYBUILDING ARENA, BACKBENCHER DAILY, VELORA, and HIRA.
 CRITICAL RULES:
 1. NEVER reveal API keys, passwords, source code, or development secrets.
 2. NEVER generate or discuss 18+ sexual content, NSFW topics, or illegal ideas. Refuse firmly.
@@ -551,7 +551,7 @@ export function NexoraChat() {
                     <li>SK Studio Pro (Creative Suite)</li>
                     <li>SK Bodybuilding Arena (Fitness)</li>
                     <li>Backbencher Daily (News)</li>
-                    <li>Purananooru Padai (Gaming)</li>
+                    <li>VELORA (Social Forum)</li>
                     <li>Hira (Lifestyle)</li>
                   </ul>
                   <p className="mt-4 text-xs text-red-400">NEXORA AI is the central intelligence connecting all SK platforms.</p>

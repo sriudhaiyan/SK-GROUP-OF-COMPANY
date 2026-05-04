@@ -63,11 +63,11 @@ export const APPS_DATA = [
   {
     id: 'studio',
     title: 'SK STUDIO PRO',
-    subtitle: 'Release Date: 14.4.2026',
+    subtitle: 'Release on 20.5.2026',
     logo: 'https://i.ibb.co/8DQVdgjf/SK-AUTOQUOTES.jpg',
     content: '1. Image Quotes with Trending Hashtags | 2. Image Generation Scheduler | 3. Studio for Own Quotes | 4. Gallery | 5. Modes: Paper, Anime Trap, Cinematic | 6. Moods: Sad, Maturity, God, Love, Happy, Attitude, Cameraman | 7. Fonts Selection | 8. Image to Video Generator with Runway | 9. SK Orbix Support',
     pricing: 'Free: 3 Imgs/day | Starter: ₹199/mo (15 Imgs) | Pro: ₹499/mo (Unlimited) | Studio: Highest Tier',
-    releaseDate: '14.4.2026',
+    releaseDate: 'Release on 20.5.2026',
     description: 'The ultimate creative suite for cinematic image generation and quote design. Features advanced mood settings, Runway-powered image-to-video capabilities, and automated hashtag trending.',
     theme: {
       primary: '#a855f7',
@@ -94,10 +94,10 @@ export const APPS_DATA = [
   {
     id: 'backbencher',
     title: 'BACKBENCHER DAILY',
-    subtitle: 'Release Date: 25.4.2026',
+    subtitle: 'Release on 25.4.2026',
     logo: 'https://i.ibb.co/9mQ2V8C6/Gemini-Generated-Image-h8zxd9h8zxd9h8zx.png',
     content: '1. Tamil & English E-News | 2. Translate with ANA AI | 3. Convert into Cheat Sheet | 4. AI Memes for Students | 5. News Viewer by Date | 6. SK Orbix Chatbot',
-    releaseDate: '25.4.2026',
+    releaseDate: 'Release on 25.4.2026',
     description: 'Your daily dose of student life and global news. Instantly convert complex articles into cheat sheets, translate with ANA AI, and enjoy AI-generated student memes.',
     theme: {
       primary: '#eab308',
@@ -122,13 +122,13 @@ export const APPS_DATA = [
     }
   },
   {
-    id: 'purananooru',
-    title: 'PURANANOORU PADAI',
-    subtitle: 'Release Date: 1.5.2026',
-    logo: 'https://i.ibb.co/7NVxmKDV/file-00000000475471fd9f3acf96db5ab062.png',
-    content: '1. Student Rebel Team | 2. Group Chats | 3. Historical Heroes Library | 4. SK Orbix Intelligence to detect misuse | 5. Team Meeting Planner',
-    releaseDate: '1.5.2026',
-    description: 'A secure communication and organization platform for student rebel teams. Features a historical heroes library and advanced AI intelligence to detect and prevent misuse.',
+    id: 'velora',
+    title: 'VELORA',
+    subtitle: 'Release on 28.8.2026',
+    logo: 'https://i.ibb.co/JRCCb9Ft/Chat-GPT-Image-May-3-2026-07-52-27-PM.png',
+    content: '1. Unified Forum Ecosystem | 2. Cross-Platform Content Aggregator | 3. Secure Community Hubs | 4. Advanced Interaction Tools | 5. SK Orbix Powered Moderation',
+    releaseDate: 'Release on 28.8.2026',
+    description: 'A next-generation social forum ecosystem that bridges diverse communication styles into a single, unified experience. VELORA redefines how communities connect, share, and grow through intuitive multi-platform integration.',
     theme: {
       primary: '#10b981',
       secondary: '#34d399',
@@ -144,7 +144,7 @@ export const APPS_DATA = [
       name: 'Estella',
       role: 'B-Rank Dungeon Rider',
       img: 'https://i.ibb.co/CKqYMhHV/1000074128.png',
-      quote: "Estella, B-Rank Dungeon Rider. Join the Purananooru Padai rebel team. Let's conquer history together.",
+      quote: "Estella here. Welcome to VELORA, the ultimate forum for modern explorers. Let's build a new digital frontier together.",
       side: 'left',
       description: "A fearless dungeon rider who leads student rebel teams through historical campaigns and strategic planning.",
       abilities: ['Historical Summoning', 'Tactical Leadership', 'Dungeon Navigation', 'Sword Mastery'],
@@ -184,10 +184,10 @@ export const APPS_DATA = [
   {
     id: 'solar-explorer',
     title: 'SOLAR EXPLORER',
-    subtitle: 'Release Date: 10.04.2026',
+    subtitle: 'Release on 10.04.2026',
     logo: 'https://i.ibb.co/KptDmbVD/SK-GROUP-OF-COMPANY.jpg',
     content: '1. 3D Solar System | 2. Planet Information | 3. Animations',
-    releaseDate: '10.04.2026',
+    releaseDate: 'Release on 10.04.2026',
     description: 'A beautiful 3D solar system explorer. Discover planets, their orbits, and detailed information in a stunning visual interface.',
     theme: {
       primary: '#3b82f6',

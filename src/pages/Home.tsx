@@ -2,67 +2,10 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
-import { LogOut, User, X } from 'lucide-react';
+import { LogOut, User, X, Film } from 'lucide-react';
 import { Fireworks } from '@fireworks-js/react';
 import { FortuneCandle } from '../components/FortuneCandle';
-
-const ProtectedImage = ({ src, alt, wrapperClassName, imageClassName, disableModal = false }: { src: string, alt: string, wrapperClassName?: string, imageClassName?: string, disableModal?: boolean }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleClick = () => {
-    if (!disableModal) {
-      setIsOpen(true);
-    }
-  };
-
-  return (
-    <>
-      <div 
-        className={`relative select-none overflow-hidden ${!disableModal ? 'cursor-pointer' : ''} ${wrapperClassName || ''}`}
-        onContextMenu={(e) => e.preventDefault()}
-        onDragStart={(e) => e.preventDefault()}
-        onClick={handleClick}
-        style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
-      >
-        <div className="absolute inset-0 z-10" onContextMenu={(e) => e.preventDefault()} />
-        <img 
-          src={src} 
-          alt={alt} 
-          className={`w-full h-full object-cover pointer-events-none ${imageClassName || ''}`} 
-          draggable="false"
-          referrerPolicy="no-referrer"
-        />
-      </div>
-
-      {!disableModal && isOpen && (
-        <div 
-          className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
-          onClick={() => setIsOpen(false)}
-          onContextMenu={(e) => e.preventDefault()}
-          onDragStart={(e) => e.preventDefault()}
-          style={{ WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
-        >
-          <button 
-            className="absolute top-6 right-6 text-white/70 hover:text-white z-50"
-            onClick={() => setIsOpen(false)}
-          >
-            <X size={32} />
-          </button>
-          <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center">
-            <div className="absolute inset-0 z-10" onContextMenu={(e) => e.preventDefault()} />
-            <img 
-              src={src} 
-              alt={alt} 
-              className="max-w-full max-h-full object-contain pointer-events-none" 
-              draggable="false"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
+import { ProtectedImage } from '../components/ProtectedImage';
 
 const BluePortal = () => {
   const [isActive, setIsActive] = useState(false);
@@ -83,6 +26,36 @@ const BluePortal = () => {
       ></div>
       <div className="text mt-4 text-[10px] text-blue-400 tracking-[0.4em] uppercase font-bold opacity-80 group-hover:opacity-100 transition-opacity">
         ENTER SK WAVE LAB
+      </div>
+    </div>
+  );
+};
+
+const DreamforgePortal = () => {
+  const [isActive, setIsActive] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    setIsActive(true);
+    setTimeout(() => {
+      navigate('/dreamforge');
+    }, 1500);
+  };
+
+  return (
+    <div className="flex flex-col items-center">
+      <div 
+        className={`w-48 h-48 rounded-full border-2 border-[#cc0000]/30 relative flex items-center justify-center cursor-pointer group hover:border-[#cc0000] transition-all duration-700 ${isActive ? 'scale-[20] opacity-0 pointer-events-none' : ''}`}
+        onClick={handleClick}
+        style={{ transition: isActive ? 'transform 1.5s forwards, opacity 1.5s forwards' : 'all 0.7s ease' }}
+      >
+        <div className="absolute inset-0 rounded-full bg-[conic-gradient(#cc0000,#660000,#cc0000)] animate-[spin_3s_linear_infinite] opacity-40 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-2 rounded-full bg-black flex items-center justify-center shadow-[inset_0_0_20px_rgba(204,0,0,0.5)]">
+           <Film className="text-white group-hover:scale-110 transition-transform duration-700" size={48} />
+        </div>
+      </div>
+      <div className="mt-6 text-[10px] text-gray-500 tracking-[0.4em] uppercase font-bold group-hover:text-white transition-colors">
+        DREAMFORGE PRODUCTIONS
       </div>
     </div>
   );
@@ -117,6 +90,7 @@ const GallerySection = () => {
                 src={img} 
                 alt={`Profile Logo ${i+1}`} 
                 wrapperClassName="w-32 h-32 md:w-48 md:h-48 rounded-full border-2 border-white/20 hover:border-[#cc0000] transition-colors duration-500 shadow-[0_0_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(204,0,0,0.3)]" 
+                disableModal={true}
               />
             ))}
           </div>
@@ -170,7 +144,7 @@ const GallerySection = () => {
             ))}
           </div>
 
-          <div className="mt-24 flex flex-col md:flex-row items-center justify-center gap-16 text-center">
+          <div className="mt-24 grid grid-cols-1 md:grid-cols-3 items-start justify-center gap-16 text-center">
             <div className="flex flex-col items-center">
               <p className="text-gray-400 font-sans text-sm tracking-widest uppercase mb-8 opacity-60">Mastery Craft</p>
               <Link to="/planetarium" className="block group">
@@ -182,6 +156,13 @@ const GallerySection = () => {
                 </div>
                 <span className="mt-6 block text-[10px] text-gray-500 tracking-[0.4em] uppercase font-bold group-hover:text-white transition-colors">Planetarium</span>
               </Link>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <p className="text-gray-400 font-sans text-sm tracking-widest uppercase mb-8 opacity-60">Creative Forge</p>
+              <div className="group">
+                <DreamforgePortal />
+              </div>
             </div>
 
             <div className="flex flex-col items-center">
@@ -230,7 +211,7 @@ const SECTIONS = [
   {
     id: 'studio',
     title: 'SK STUDIO PRO',
-    subtitle: 'Release Date: 14.4.2026',
+    subtitle: 'Release on 20.5.2026',
     logo: 'https://i.ibb.co/8DQVdgjf/SK-AUTOQUOTES.jpg',
     content: '1. Image Quotes with Trending Hashtags | 2. Image Generation Scheduler | 3. Studio for Own Quotes | 4. Gallery | 5. Modes: Paper, Anime Trap, Cinematic | 6. Moods: Sad, Maturity, God, Love, Happy, Attitude, Cameraman | 7. Fonts Selection | 8. Image to Video Generator with Runway | 9. SK Orbix Support',
     pricing: 'Free: 3 Imgs/day | Starter: ₹199/mo (15 Imgs) | Pro: ₹499/mo (Unlimited) | Studio: Highest Tier',
@@ -245,7 +226,7 @@ const SECTIONS = [
   {
     id: 'backbencher',
     title: 'BACKBENCHER DAILY',
-    subtitle: 'Release Date: 25.4.2026',
+    subtitle: 'Release on 25.4.2026',
     logo: 'https://i.ibb.co/9mQ2V8C6/Gemini-Generated-Image-h8zxd9h8zxd9h8zx.png',
     content: '1. Tamil & English E-News | 2. Translate with ANA AI | 3. Convert into Cheat Sheet | 4. AI Memes for Students | 5. News Viewer by Date | 6. SK Orbix Chatbot',
     character: {
@@ -257,16 +238,16 @@ const SECTIONS = [
     }
   },
   {
-    id: 'purananooru',
-    title: 'PURANANOORU PADAI',
-    subtitle: 'Release Date: 1.5.2026',
-    logo: 'https://i.ibb.co/7NVxmKDV/file-00000000475471fd9f3acf96db5ab062.png',
-    content: '1. Student Rebel Team | 2. Group Chats | 3. Historical Heroes Library | 4. SK Orbix Intelligence to detect misuse | 5. Team Meeting Planner',
+    id: 'velora',
+    title: 'VELORA',
+    subtitle: 'Release on 28.8.2026',
+    logo: 'https://i.ibb.co/JRCCb9Ft/Chat-GPT-Image-May-3-2026-07-52-27-PM.png',
+    content: '1. Unified Forum Ecosystem | 2. Cross-Platform Content Aggregator | 3. Secure Community Hubs | 4. Advanced Interaction Tools | 5. SK Orbix Powered Moderation',
     character: {
       name: 'Estella',
       role: 'B-Rank Dungeon Rider',
       img: 'https://i.ibb.co/CKqYMhHV/1000074128.png',
-      quote: "Estella, B-Rank Dungeon Rider. Join the Purananooru Padai rebel team. Let's conquer history together.",
+      quote: "Estella here. Welcome to VELORA, the ultimate forum for modern explorers. Let's build a new digital frontier together.",
       side: 'left'
     }
   },

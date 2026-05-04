@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import dotenv from "dotenv";
 import proxyHandler from "./api/proxy.ts";
+import githubHandler from "./api/github.ts";
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +14,7 @@ async function startServer() {
 
   // Live API WebSocket and HTTP proxy to hide API key
   app.use("/api/proxy", proxyHandler);
+  app.get("/api/github", githubHandler);
 
   // Middleware for parsing JSON requests
   app.use(express.json({ limit: "50mb" }));
