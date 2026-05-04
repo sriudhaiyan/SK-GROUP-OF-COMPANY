@@ -548,6 +548,29 @@ export function Home() {
         <div className="snap-center relative w-full">
           <FortuneCandle />
         </div>
+
+        {/* Footer */}
+        <footer className="w-full py-12 px-8 bg-black border-t border-white/10 relative z-20">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 opacity-60 hover:opacity-100 transition-opacity">
+            <div className="text-[10px] text-gray-500 tracking-[0.4em] uppercase font-bold">
+              © 2026 SK GROUP OF COMPANY
+            </div>
+            <div className="flex gap-8">
+              <Link 
+                to="/privacy-policy" 
+                className="text-[10px] text-gray-400 hover:text-white tracking-[0.4em] uppercase font-bold transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link 
+                to="/terms-and-conditions" 
+                className="text-[10px] text-gray-400 hover:text-white tracking-[0.4em] uppercase font-bold transition-colors"
+              >
+                Terms & Conditions
+              </Link>
+            </div>
+          </div>
+        </footer>
       </div>
 
       {/* Foreground Parallax Layer (Fast Moving Particles/Streaks) */}

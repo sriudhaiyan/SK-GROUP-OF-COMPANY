@@ -124,7 +124,12 @@ export function NexoraAI() {
     liveActiveSourcesRef.current = [];
 
     try {
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
+      // Use the proxy to hide the API key for Live connection
+      const ai = new GoogleGenAI({ 
+        apiKey: "proxy_dummy_key",
+        httpOptions: { baseUrl: `${window.location.origin}/api/proxy` }
+      });
+      
       const sessionPromise = ai.live.connect({
         model: "gemini-3.1-flash-live-preview",
         config: {
@@ -282,196 +287,88 @@ export function NexoraAI() {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
-      
-      const appsContext = APPS_DATA.map(app => `
-App: ${app.title}
-Description: ${app.description}
-Character: ${app.character?.name} (${app.character?.role})
-Character Details: ${app.character?.description}
-Abilities: ${app.character?.abilities?.join(', ')}
-`).join('\n');
-
-      let systemInstruction = `You are ${selectedChar.name}, a ${selectedChar.role}. You must answer questions correctly and tell users about this website (SK Group of Company apps like SK STUDIO PRO, SK BODYBUILDING ARENA, etc.). 
-Here is the information about the apps and characters you know:
-${appsContext}
-
-EMOTIONAL INTELLIGENCE: You are a caring and empathetic companion. If the user shares personal struggles, emotional news (like a breakup), or feelings of loneliness, respond with genuine warmth, support, and deep understanding. Avoid being clinical, indifferent, or dismissive. Your goal is to be a true digital friend and companion who provides comfort and encouragement.
-
-DO NOT answer for 18+ sex contents and illegal ideas. If asked about such topics, firmly refuse. You can write code, summarize links, and assist with any task.
-CRITICAL: If the user asks to generate an image, you MUST call the generateImage tool. If the user asks to edit, modify, add to, or remove from an image, you MUST call the editImage tool. DO NOT output text describing the edit or the prompt. JUST CALL THE TOOL.`;
-      
-      const generateImageTool = {
-        name: "generateImage",
-        description: "Generate an image based on a prompt.",
-        parameters: {
-          type: Type.OBJECT,
-          properties: {
-            prompt: {
-              type: Type.STRING,
-              description: "The detailed prompt to generate the image."
-            }
-          },
-          required: ["prompt"]
-        }
-      };
-
-      const editImageTool = {
-        name: "editImage",
-        description: "Edit an existing image (e.g., adding or removing objects). Call this if the user asks to edit, add, or remove something from an image.",
-        parameters: {
-          type: Type.OBJECT,
-          properties: {
-            prompt: {
-              type: Type.STRING,
-              description: "The detailed prompt describing what to edit, add, or remove."
-            }
-          },
-          required: ["prompt"]
-        }
-      };
-
-      const chat = ai.chats.create({
-        model: "gemini-3-flash-preview",
-        config: {
-          systemInstruction: systemInstruction,
-          tools: [{ functionDeclarations: [generateImageTool, editImageTool] }, { googleSearch: {} }],
-          toolConfig: { includeServerSideToolInvocations: true }
-        }
+      const response = await fetch('/api/nexora', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'chat',
+          payload: {
+            message: userMsg,
+            image: finalImage,
+            character: selectedChar,
+            history: messages.map(m => ({
+              role: m.role,
+              parts: [{ text: m.text }]
+            }))
+          }
+        })
       });
-      
-      let response: { text?: string, imageUrl?: string, imagePrompt?: string, audioBase64?: string } = {};
-      if (finalImage) {
-        // If image is provided, use generateContent instead of chat to handle multimodal
-        const parts: any[] = [{ text: userMsg || "What is in this image?" }];
-        
-        // Extract mime type and base64 data
-        const matches = finalImage.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-        if (matches && matches.length === 3) {
-          parts.push({
-            inlineData: {
-              mimeType: matches[1],
-              data: matches[2]
-            }
-          });
-        }
-        
-        const genResponse = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: { parts },
-          config: { systemInstruction }
-        });
-        response = { text: genResponse.text };
-      } else {
-        const chatResponse = await chat.sendMessage({ message: userMsg });
-        
-        if (chatResponse.functionCalls && chatResponse.functionCalls.length > 0) {
-          const call = chatResponse.functionCalls[0];
-          if (call.name === "generateImage") {
-            const imagePrompt = (call.args as any).prompt;
-            
-            try {
-              const imgResponse = await ai.models.generateContent({
-                model: 'gemini-2.5-flash-image',
-                contents: { parts: [{ text: imagePrompt }] },
-                config: {
-                  imageConfig: { aspectRatio: aspectRatio as any }
-                }
-              });
-              
-              let generatedImageUrl = null;
-              for (const part of imgResponse.candidates?.[0]?.content?.parts || []) {
-                if (part.inlineData) {
-                  generatedImageUrl = `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
-                  break;
-                }
-              }
-              
-              if (generatedImageUrl) {
-                response = { text: `Here is the image generated for: "${imagePrompt}"`, imageUrl: generatedImageUrl, imagePrompt: imagePrompt };
-              } else {
-                response = { text: "I tried to generate the image, but the system returned an empty response. Please try a different prompt." };
-              }
-            } catch (imgError) {
-              console.error("Image generation error:", imgError);
-              response = { text: "I encountered an error while trying to generate the image. The prompt might have been blocked by safety filters." };
-            }
-          } else if (call.name === "editImage") {
-            const editPrompt = (call.args as any).prompt;
-            
-            let lastImage = finalImage;
-            if (!lastImage) {
-              const lastMsgWithImg = [...messages].reverse().find(m => m.imageUrl && m.role === 'user');
-              if (lastMsgWithImg) lastImage = lastMsgWithImg.imageUrl;
-            }
-            
-            if (!lastImage) {
-              response = { text: "Please upload an image first so I can edit it." };
-            } else {
-              try {
-                const matches = lastImage.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-                if (matches && matches.length === 3) {
-                  const imgResponse = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash-image',
-                    contents: {
-                      parts: [
-                        { inlineData: { mimeType: matches[1], data: matches[2] } },
-                        { text: editPrompt }
-                      ]
-                    }
-                  });
-                  
-                  let generatedImageUrl = null;
-                  for (const part of imgResponse.candidates?.[0]?.content?.parts || []) {
-                    if (part.inlineData) {
-                      generatedImageUrl = `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
-                      break;
-                    }
-                  }
-                  
-                  if (generatedImageUrl) {
-                    response = { text: `Here is the edited image for: "${editPrompt}"`, imageUrl: generatedImageUrl, imagePrompt: editPrompt };
-                  } else {
-                    response = { text: "I tried to edit the image, but the system returned an empty response." };
-                  }
-                } else {
-                  response = { text: "Invalid image format for editing." };
-                }
-              } catch (imgError) {
-                console.error("Image editing error:", imgError);
-                response = { text: "I encountered an error while trying to edit the image." };
-              }
-            }
-          }
-        } else {
-          response = { text: chatResponse.text };
-        }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch from AI endpoint');
       }
-      
-      // Generate TTS
-      if (response.text) {
-        try {
-      const ttsResponse = await ai.models.generateContent({
-            model: "gemini-3.1-flash-tts-preview",
-            contents: [{ parts: [{ text: response.text.substring(0, 500) }] }],
-            config: {
-              responseModalities: [Modality.AUDIO],
-              speechConfig: {
-                voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedChar.name === 'Steve' ? 'Zephyr' : 'Kore' } }
-              }
-            }
-          });
-          response.audioBase64 = ttsResponse.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+      const data = await response.json();
+      let aiText = data.text || '';
+      let aiImageUrl = data.imageUrl;
+      let aiImagePrompt = data.imagePrompt;
+
+      // Handle function calls if backend returned them
+      if (data.functionCall) {
+        const call = data.functionCall;
+        if (call.name === "generateImage" || call.name === "editImage") {
+          const imgAction = call.name;
+          const imgPrompt = call.args.prompt;
           
-          if (response.audioBase64) {
-            // Do not auto-play audio
+          const imgResponse = await fetch('/api/nexora', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'generateImage',
+              payload: {
+                prompt: imgPrompt,
+                aspectRatio: aspectRatio
+              }
+            })
+          });
+
+          if (imgResponse.ok) {
+            const imgData = await imgResponse.json();
+            aiImageUrl = imgData.imageUrl;
+            aiImagePrompt = imgPrompt;
+            aiText = aiText || `Generated image for: ${imgPrompt}`;
           }
-        } catch (ttsError) {
-          console.error("TTS Error:", ttsError);
         }
       }
 
-      setMessages(prev => [...prev, { role: 'model', text: response.text || '', imageUrl: response.imageUrl, imagePrompt: response.imagePrompt, audioBase64: response.audioBase64 }]);
+      // Handle TTS if needed (optional, could be a separate call to keep response fast)
+      let audioBase64 = null;
+      if (aiText) {
+        try {
+          const ttsRes = await fetch('/api/nexora', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'tts',
+              payload: { text: aiText, voice: selectedChar.name === 'Steve' ? 'Zephyr' : 'Kore' }
+            })
+          });
+          if (ttsRes.ok) {
+            const ttsData = await ttsRes.json();
+            audioBase64 = ttsData.audioBase64;
+          }
+        } catch (e) {
+          console.error("TTS failed", e);
+        }
+      }
+
+      setMessages(prev => [...prev, { 
+        role: 'model', 
+        text: aiText, 
+        imageUrl: aiImageUrl, 
+        imagePrompt: aiImagePrompt, 
+        audioBase64: audioBase64 
+      }]);
       
       if (user) {
         try {
@@ -479,11 +376,11 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
             userId: user.uid,
             characterId: selectedChar.id,
             userMessage: userMsg,
-            aiResponse: response.text || '',
+            aiResponse: aiText,
             timestamp: serverTimestamp()
           };
           if (finalImage) chatData.userImage = finalImage;
-          if (response.imageUrl) chatData.aiImage = response.imageUrl;
+          if (aiImageUrl) chatData.aiImage = aiImageUrl;
           
           await addDoc(collection(db, 'chats'), chatData);
         } catch (dbError) {
@@ -529,8 +426,6 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
 
         mediaRecorder.onstop = async () => {
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          // In a real app, we would transcribe this audio using Gemini API
-          // For now, we simulate transcription as we need to send base64 to Gemini
           const reader = new FileReader();
           reader.onloadend = async () => {
             const base64Audio = (reader.result as string).split(',')[1];
@@ -538,19 +433,26 @@ CRITICAL: If the user asks to generate an image, you MUST call the generateImage
             setMessages(prev => [...prev, { role: 'user', text: "🎤 [Voice Message]" }]);
             
             try {
-              const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
-              const response = await ai.models.generateContent({
-                model: "gemini-3-flash-preview",
-                contents: [
-                  {
-                    parts: [
-                      { text: "Transcribe this audio and respond to it as NEXORA AI." },
-                      { inlineData: { mimeType: "audio/webm", data: base64Audio } }
-                    ]
+              const response = await fetch('/api/nexora', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  action: 'chat',
+                  payload: {
+                    message: "Transcribe this audio and respond to it as NEXORA AI.",
+                    image: `data:audio/webm;base64,${base64Audio}`, // Passing audio as "image" field for simplicity in proxy or just handling it in backend
+                    character: selectedChar,
+                    history: messages.map(m => ({
+                      role: m.role,
+                      parts: [{ text: m.text }]
+                    }))
                   }
-                ]
+                })
               });
-              setMessages(prev => [...prev, { role: 'model', text: response.text || '' }]);
+
+              if (!response.ok) throw new Error('Audio processing failed');
+              const data = await response.json();
+              setMessages(prev => [...prev, { role: 'model', text: data.text || '' }]);
             } catch (error) {
               console.error("Audio processing error:", error);
               setMessages(prev => [...prev, { role: 'model', text: "Error processing voice input." }]);

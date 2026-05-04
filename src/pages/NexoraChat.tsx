@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI, Type, Modality } from '@google/genai';
 import { useAuth } from '../contexts/AuthContext';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
@@ -93,18 +92,19 @@ export function NexoraChat() {
 
   const handleTTS = async (text: string) => {
     try {
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-tts-preview",
-        contents: [{ parts: [{ text }] }],
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Zephyr' } },
-          },
-        },
+      const response = await fetch('/api/nexora', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'tts',
+          payload: { text, voice: 'Zephyr' }
+        })
       });
-      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      
+      if (!response.ok) throw new Error('TTS failed');
+      const data = await response.json();
+      const base64Audio = data.audioBase64;
+
       if (base64Audio) {
         const binaryString = atob(base64Audio);
         const bytes = new Uint8Array(binaryString.length);
@@ -125,23 +125,18 @@ export function NexoraChat() {
 
   const handleGenerateImage = async (prompt: string) => {
     try {
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-flash-image-preview',
-        contents: { parts: [{ text: prompt }] },
-        config: {
-          imageConfig: { aspectRatio: "1:1", imageSize: "1K" }
-        }
+      const response = await fetch('/api/nexora', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generateImage',
+          payload: { prompt, aspectRatio: "1:1" }
+        })
       });
       
-      let imageUrl = null;
-      for (const part of response.candidates?.[0]?.content?.parts || []) {
-        if (part.inlineData) {
-          imageUrl = `data:image/jpeg;base64,${part.inlineData.data}`;
-          break;
-        }
-      }
-      return imageUrl;
+      if (!response.ok) throw new Error('Image generation failed');
+      const data = await response.json();
+      return data.imageUrl;
     } catch (error) {
       console.error("Image generation error:", error);
       return null;
@@ -185,31 +180,26 @@ export function NexoraChat() {
           return newMsgs;
         });
       } else {
-        const ai = new GoogleGenAI({ apiKey: "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg" });
-        
-        const contents: any[] = [];
-        if (currentImage) {
-          const base64Data = currentImage.split(',')[1];
-          const mimeType = currentImage.split(';')[0].split(':')[1];
-          contents.push({
-            inlineData: { data: base64Data, mimeType }
-          });
-        }
-        if (userMessage) {
-          contents.push(userMessage);
-        }
-
-        const response = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
-          contents: contents,
-          config: {
-            systemInstruction: selectedCharId === 'nexora' 
-              ? SYSTEM_INSTRUCTION 
-              : `You are ${selectedChar.name}, ${selectedChar.role}. Respond in character.`,
-          }
+        const response = await fetch('/api/nexora', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'chat',
+            payload: {
+              message: userMessage,
+              image: currentImage,
+              character: selectedChar,
+              history: messages.slice(-10).map(m => ({
+                role: m.role,
+                parts: [{ text: m.content }]
+              }))
+            }
+          })
         });
 
-        aiResponse = response.text || "I couldn't process that.";
+        if (!response.ok) throw new Error('Chat failed');
+        const data = await response.json();
+        aiResponse = data.text || "I couldn't process that.";
         setMessages(prev => [...prev, { role: 'model', content: aiResponse }]);
       }
 

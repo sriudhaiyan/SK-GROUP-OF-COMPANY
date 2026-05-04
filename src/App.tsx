@@ -22,7 +22,6 @@ import { Planetarium } from './pages/Planetarium';
 import { SkWavelab } from './pages/SkWavelab';
 import { Dreamforge } from './pages/Dreamforge';
 import { DashboardNav } from './components/DashboardNav';
-import { GlobalPlayer } from './components/GlobalPlayer';
 import { OrbixBot } from './components/OrbixBot';
 import { CharacterChat } from './components/CharacterChat';
 import { BackButton } from './components/BackButton';
@@ -87,7 +86,6 @@ export default function App() {
             <Route path="/terms-and-conditions" element={null} />
             <Route path="*" element={
               <>
-                <GlobalPlayer />
                 <OrbixBot />
                 <CharacterChat />
               </>
