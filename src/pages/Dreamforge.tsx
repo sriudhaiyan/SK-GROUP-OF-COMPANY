@@ -382,18 +382,18 @@ export function Dreamforge() {
                 </p>
               </div>
               
-              <div className="grid grid-cols-3 gap-4 pt-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8">
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
-                  <div className="text-xl font-black text-white">SK GROUP</div>
-                  <div className="text-[8px] text-gray-500 uppercase tracking-widest">Ownership</div>
+                  <div className="text-lg md:text-xl font-black text-white">SK GROUP</div>
+                  <div className="text-[8px] text-gray-500 uppercase tracking-widest font-bold">Ownership</div>
                 </div>
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
-                  <div className="text-xl font-black text-[#cc0000]">DREAMFORGE</div>
-                  <div className="text-[8px] text-gray-500 uppercase tracking-widest">Creation</div>
+                  <div className="text-lg md:text-xl font-black text-[#cc0000]">DREAMFORGE</div>
+                  <div className="text-[8px] text-gray-500 uppercase tracking-widest font-bold">Creation</div>
                 </div>
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center">
-                  <div className="text-xl font-black text-white">SPIEOH</div>
-                  <div className="text-[8px] text-gray-500 uppercase tracking-widest">Vision</div>
+                  <div className="text-lg md:text-xl font-black text-white">SPIEOH</div>
+                  <div className="text-[8px] text-gray-500 uppercase tracking-widest font-bold">Vision</div>
                 </div>
               </div>
             </motion.div>

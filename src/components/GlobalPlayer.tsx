@@ -11,16 +11,14 @@ export function GlobalPlayer() {
   // Don't show on the main wavelab page to avoid redundancy
   if (location.pathname === '/wavelab') return null;
 
-  const isNexora = location.pathname === '/nexora';
-
   return (
     <AnimatePresence>
       {currentSong && (
         <motion.div 
-          initial={{ y: isNexora ? -100 : 100, opacity: 0 }}
+          initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: isNexora ? -100 : 100, opacity: 0 }}
-          className={`fixed ${isNexora ? 'top-24 right-6 md:right-8' : 'bottom-6 left-6 right-6 md:left-auto md:right-32'} md:w-80 z-50 pointer-events-auto`}
+          exit={{ y: 100, opacity: 0 }}
+          className="fixed bottom-6 left-6 right-6 md:left-auto md:right-32 md:w-80 z-50 pointer-events-auto"
         >
           <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 flex items-center gap-4 shadow-2xl overflow-hidden group">
             <Link to="/wavelab" className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden border border-white/10">

@@ -4,7 +4,6 @@ import path from "path";
 import dotenv from "dotenv";
 import proxyHandler from "./api/proxy.ts";
 import githubHandler from "./api/github.ts";
-import nexoraHandler from "./api/nexora.ts";
 
 // Load environment variables
 dotenv.config();
@@ -19,7 +18,6 @@ async function startServer() {
   // Live API WebSocket and HTTP proxy to hide API key
   app.use("/api/proxy", proxyHandler);
   app.get("/api/github", githubHandler);
-  app.post("/api/nexora", nexoraHandler);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

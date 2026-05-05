@@ -1,6 +1,6 @@
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
-// Explicitly use the provided key per user request to use the API for SK ORBIX and NEXORA
+// Explicitly use the provided key per user request to use the API for SK ORBIX
 // The environment variable may be a dummy key, so we use the explicitly provided one.
 const TARGET_API_KEY = "AIzaSyDEQyjTcwfMZVNOnXzJlvxTeHd1ndyKDCg";
 

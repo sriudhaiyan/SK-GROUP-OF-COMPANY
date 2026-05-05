@@ -15,7 +15,6 @@ import { Characters } from './pages/Characters';
 import { Channels } from './pages/Channels';
 import { AppDetails } from './pages/AppDetails';
 import { CharacterDetails } from './pages/CharacterDetails';
-import { NexoraAI } from './pages/NexoraAI';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsAndConditions } from './pages/TermsAndConditions';
 import { Planetarium } from './pages/Planetarium';
@@ -23,7 +22,6 @@ import { SkWavelab } from './pages/SkWavelab';
 import { Dreamforge } from './pages/Dreamforge';
 import { DashboardNav } from './components/DashboardNav';
 import { OrbixBot } from './components/OrbixBot';
-import { CharacterChat } from './components/CharacterChat';
 import { BackButton } from './components/BackButton';
 import { AnimatePresence } from 'motion/react';
 
@@ -58,7 +56,6 @@ function AnimatedRoutes() {
         <Route path="/character/:id" element={<ProtectedRoute><CharacterDetails /></ProtectedRoute>} />
         <Route path="/channels" element={<ProtectedRoute><Channels /></ProtectedRoute>} />
         <Route path="/app/:id" element={<ProtectedRoute><AppDetails /></ProtectedRoute>} />
-        <Route path="/nexora" element={<ProtectedRoute><NexoraAI /></ProtectedRoute>} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       </Routes>
@@ -74,7 +71,6 @@ export default function App() {
           <BackButton />
           <Routes>
             <Route path="/auth" element={null} />
-            <Route path="/nexora" element={null} />
             <Route path="/privacy-policy" element={null} />
             <Route path="/terms-and-conditions" element={null} />
             <Route path="*" element={<DashboardNav />} />
@@ -87,7 +83,6 @@ export default function App() {
             <Route path="*" element={
               <>
                 <OrbixBot />
-                <CharacterChat />
               </>
             } />
           </Routes>

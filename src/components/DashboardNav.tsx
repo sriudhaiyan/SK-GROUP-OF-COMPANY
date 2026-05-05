@@ -17,7 +17,6 @@ export function DashboardNav() {
     { name: 'NEWS', path: '/news' },
     { name: 'APPS', path: '/apps' },
     { name: 'SK WAVELAB', path: '/wavelab' },
-    { name: 'NEXORA AI', path: '/nexora' },
     { name: 'SK ORBIX', action: () => window.dispatchEvent(new CustomEvent('open-orbix')) },
     { name: 'CHARACTER', path: '/characters' },
     { name: 'OFFICIAL CHANNELS', path: '/channels' },

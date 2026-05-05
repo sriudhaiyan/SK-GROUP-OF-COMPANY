@@ -7,21 +7,41 @@ export function Auth() {
   const [error, setError] = useState<string | null>(null);
   const [videoStage, setVideoStage] = useState(1); // 1: Video 1, 2: Video 2
 
-  const handleSignIn = async () => {
-    try {
-      // Attempt to prepare for landscape orientation on mobile
-      if (typeof window !== 'undefined' && 'screen' in window && 'orientation' in window.screen) {
+  // Orientation Logic
+  React.useEffect(() => {
+    if (user) {
+      const lockOrientation = async () => {
         try {
-          if (document.documentElement.requestFullscreen) {
-            // We can't lock without fullscreen, but we can't request fullscreen without a direct user gesture
-            // This button click IS a gesture, so let's try.
-            await document.documentElement.requestFullscreen().catch(() => {});
+          if (typeof window !== 'undefined' && 'screen' in window && 'orientation' in window.screen) {
+            if (document.documentElement.requestFullscreen) {
+              await document.documentElement.requestFullscreen().catch(() => {});
+            }
             await (window.screen.orientation as any).lock('landscape').catch(() => {});
           }
         } catch (e) {
-          console.log('Orientation lock prep failed:', e);
+          console.warn('Orientation lock failed:', e);
+        }
+      };
+      lockOrientation();
+    }
+  }, [user]);
+
+  const handleEnterPortal = async () => {
+    try {
+      if (typeof window !== 'undefined' && 'screen' in window && 'orientation' in window.screen) {
+        await (window.screen.orientation as any).unlock().catch(() => {});
+        if (document.exitFullscreen) {
+          await document.exitFullscreen().catch(() => {});
         }
       }
+    } catch (e) {
+      console.warn('Orientation unlock failed:', e);
+    }
+    window.location.href = '/';
+  };
+
+  const handleSignIn = async () => {
+    try {
       setError(null);
       await signInWithGoogle();
     } catch (err: any) {
@@ -49,7 +69,7 @@ export function Auth() {
           <div className="relative w-full h-full overflow-hidden">
             <iframe
               src={videoStage === 1 
-                ? "https://www.youtube.com/embed/Qd-Ma0xfETA?si=acL_ck7VRSLIZX4G&controls=0&autoplay=1&mute=1&loop=1&vq=hd1080&rel=0&modestbranding=1"
+                ? "https://go.screenpal.com/player/cOhhhXntc8n?ff=1&ahc=1&dcc=1&tl=1&bg=transparent&share=1&download=1&embed=1&cl=1&autoplay=1"
                 : "https://www.youtube.com/embed/9nnDMMmlI78?si=OHthx6gTcJtrhQdH&controls=0&autoplay=1&mute=1&loop=1&vq=hd2160&rel=0&modestbranding=1"
               }
               className="absolute top-1/2 left-1/2 w-[115%] h-[115%] -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full pointer-events-none"
@@ -78,7 +98,7 @@ export function Auth() {
               </button>
             ) : (
               <button 
-                onClick={() => window.location.href = '/'}
+                onClick={handleEnterPortal}
                 className="w-full px-8 py-6 bg-gradient-to-r from-[#cc0000] to-[#660000] rounded-2xl font-display text-xl tracking-[0.3em] uppercase transition-all duration-700 transform hover:scale-[1.02] active:scale-95 shadow-[0_0_50px_rgba(204,0,0,0.4)] flex flex-col items-center gap-1 group overflow-hidden relative"
               >
                 <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
