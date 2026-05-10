@@ -2729,3 +2729,38 @@ body .closeBig {
 body .solar_systm .planet_description .read-more a { display: inline-block; margin-top: 20px; padding: 10px 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; color: white; text-transform: uppercase; letter-spacing: 2px; font-size: 12px; transition: all 0.3s; }
 
 body .solar_systm .planet_description .read-more a:hover { background: rgba(255, 255, 255, 0.3); }
+
+/* FIX FOR DESKTOP READ MORE CLICKS */
+body .solar_systm .planet_description .read-more,
+body .solar_systm .planet_description .read-more a,
+body .solar_systm .planet_description .read-more span {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 2147483647 !important;
+}
+
+body .solar_systm .planet_description .read-more {
+    transform: translateZ(150px) !important;
+}
+
+body .solar {
+    pointer-events: none !important;
+}
+
+body .solar_systm {
+    pointer-events: none;
+}
+
+body input[type=radio][name=planet]:checked + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + input + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm,
+body input[type=radio][name=planet]:checked + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + input + label + div .solar_systm {
+    pointer-events: auto !important;
+}
+

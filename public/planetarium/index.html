@@ -401,8 +401,10 @@
       const panelTitle = document.getElementById('panelTitle');
       const panelDescription = document.getElementById('panelDescription');
 
-      readMoreButtons.forEach(button => {
-        button.addEventListener('click', (e) => { console.log('Read More clicked!');
+      document.addEventListener('click', (e) => {
+        const button = e.target.closest('.read-more');
+        if (button) {
+          console.log('Read More clicked via delegation!');
           e.preventDefault();
           const planetName = button.getAttribute('data-planet');
           
@@ -434,7 +436,7 @@
             panelTitle.textContent = "Error";
             panelDescription.innerHTML = '<p style="color: #ff4444;">Failed to load planet details. Please try again later.</p>';
           }
-        });
+        }
       });
 
       closePanel.addEventListener('click', () => {

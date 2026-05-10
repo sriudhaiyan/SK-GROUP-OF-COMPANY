@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'motion/react';
 import { Play, Film, User, Star, ChevronDown, Mail, Send, ShieldCheck, ExternalLink } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { ProtectedImage } from '../components/ProtectedImage';
-import { GithubShowcase } from '../components/GithubShowcase';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -52,6 +52,7 @@ export function Dreamforge() {
     if (!user) return;
     setIsSubmitting(true);
     try {
+      // 1. Save to Firestore
       await addDoc(collection(db, 'inquiries'), {
         ...formData,
         userId: user.uid,
@@ -59,10 +60,29 @@ export function Dreamforge() {
         timestamp: serverTimestamp(),
         source: 'Dreamforge Productions'
       });
+
+      // 2. Send via EmailJS
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        message: formData.message,
+        source: 'Dreamforge Productions',
+        user_id: user.uid,
+        user_email: user.email
+      };
+
+      await emailjs.send(
+        'service_i4rfur8', 
+        'template_bh7ob9d', 
+        templateParams,
+        'Swmp282SaS3OYTY5Y'
+      );
+
       setSubmitted(true);
       setFormData({ name: '', email: '', message: '' });
     } catch (error) {
       console.error('Error submitting inquiry:', error);
+      alert('Failed to send message. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -601,17 +621,6 @@ export function Dreamforge() {
               )}
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* GitHub Integration Section */}
-      <section className="py-32 px-4 md:px-8 border-t border-white/5 bg-gradient-to-b from-[#050505] to-[#0a0a0a]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-black tracking-tighter italic mb-4">OPEN SOURCE <span className="text-[#cc0000]">ECOSYSTEM</span></h2>
-            <p className="text-gray-500 tracking-[0.4em] uppercase text-xs">SK Digital Infrastructure & Assets</p>
-          </div>
-          <GithubShowcase />
         </div>
       </section>
 
